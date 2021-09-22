@@ -5,6 +5,8 @@
         <group>
             <file>file:/C:/Users/Manel/Documents/NetBeansProjects/SmartHomeSystem2/src/smarthomesystem/Main.java</file>
             <file>file:/C:/Users/Manel/Documents/NetBeansProjects/SmartHomeSystem2/src/smarthomesystem/commandhandlers/ArduinoPeripheralsCommandHandler.java</file>
+            <file>file:/C:/Users/Manel/Documents/NetBeansProjects/SmartHomeSystem2/src/smarthomesystem/commandhandlers/ArduinoPeripheralsCommandHandlerInterface.java</file>
+            <file>file:/C:/Users/Manel/Documents/NetBeansProjects/SmartHomeSystem2/src/messaging/MessageFactory.java</file>
         </group>
     </open-files>
 </project-private>

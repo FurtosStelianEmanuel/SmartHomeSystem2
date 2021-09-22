@@ -20,6 +20,9 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Set;
+import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JButton;
@@ -50,6 +53,11 @@ import messaging.commands.TurnOffBuiltInLedCommand;
 import messaging.commands.TurnOnBuiltInLedCommand;
 import messaging.commands.responses.TurnOffBuiltInLedCommandResponse;
 import messaging.commands.responses.TurnOnBuiltInLedCommandResponse;
+import org.reflections.Reflections;
+import org.reflections.scanners.SubTypesScanner;
+import org.reflections.scanners.TypeAnnotationsScanner;
+import org.reflections.util.ClasspathHelper;
+import org.reflections.util.ConfigurationBuilder;
 import smarthomesystem.commandhandlers.ArduinoPeripheralsCommandHandler;
 import smarthomesystem.commands.SetSerialSettingsCommand;
 import smarthomesystem.commands.responses.SetSerialSettingsCommandResponse;
@@ -64,7 +72,7 @@ import threading.factories.MessageDispatcherWorkerFactory;
  *
  * @author Manel
  */
-public class Main {
+public class SmartHomeSystem {
 
     public static InjectorInterface container;
 
@@ -94,8 +102,18 @@ public class Main {
 
             container.initialise();
         } catch (InterfaceNotImplemented | ClassNotInjectable | NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException | UnresolvableDependency ex) {
-            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(SmartHomeSystem.class.getName()).log(Level.SEVERE, null, ex);
             System.exit(0);
+        }
+    }
+
+    private void initHandlers() throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, UnresolvableDependency {
+        Reflections reflections = new Reflections(getClass().getPackage().getName(), new SubTypesScanner(false));
+        Set<Class<? extends CommandHandler>> commandHandlers = reflections.getSubTypesOf(CommandHandler.class);
+        Iterator<Class<? extends CommandHandler>> iterator = commandHandlers.iterator();
+        while(iterator.hasNext()){
+            Class<? extends CommandHandler> next = iterator.next();
+            container.resolveDependencies(next);
         }
     }
 
@@ -107,7 +125,7 @@ public class Main {
                     setAddress("98D311F85C34");
                 }
             };
-
+            initHandlers();
             broker.initConnection(config);
             broker.startBackgroundWorkers();
             JFrame f = new JFrame();
@@ -147,7 +165,7 @@ public class Main {
                                     }
                                     ));
                                 } catch (IllegalAccessException | PackingNotImplementedException | IOException ex) {
-                                    Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+                                    Logger.getLogger(SmartHomeSystem.class.getName()).log(Level.SEVERE, null, ex);
                                 }
                                 break;
                             case 1:
@@ -156,7 +174,7 @@ public class Main {
                                         tester.run();
                                     }
                                 } catch (Exception ex) {
-                                    Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+                                    Logger.getLogger(SmartHomeSystem.class.getName()).log(Level.SEVERE, null, ex);
                                 }
                                 break;
                             case 2:
@@ -204,12 +222,11 @@ public class Main {
                         }
                         count = (++count) % 5;
                     } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException | UnresolvableDependency | PackingNotImplementedException | IOException ex) {
-                        Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+                        Logger.getLogger(SmartHomeSystem.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 }
             });
-            CommandHandler arduinoCommandHandler = container.resolveDependencies(ArduinoPeripheralsCommandHandler.class);
-            
+
             JButton exit = new JButton("iesi acasa");
             exit.addActionListener((ActionEvent ae) -> {
 
@@ -220,14 +237,15 @@ public class Main {
             f.setVisible(true);
             f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException | UnresolvableDependency | IOException | IllegalArgumentException | PackingNotImplementedException | ThreadNotFoundException | ThreadAlreadyStartedException ex) {
-            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(SmartHomeSystem.class.getName()).log(Level.SEVERE, null, ex);
             System.exit(0);
         }
+
     }
 
     public static void main(String[] args) throws IOException, ThreadNotFoundException, ThreadAlreadyStartedException, IllegalArgumentException, IllegalAccessException, PackingNotImplementedException, InterfaceNotImplemented, ClassNotInjectable, NoSuchMethodException, NoSuchMethodException, NoSuchMethodException, InstantiationException, InvocationTargetException, UnresolvableDependency, ClassNotInjectable {
-        Main main = new Main();
-        main.initDependencyInjection();
-        main.initSmartHomeSystem();
+        SmartHomeSystem smartHomeSystem = new SmartHomeSystem();
+        smartHomeSystem.initDependencyInjection();
+        smartHomeSystem.initSmartHomeSystem();
     }
 }

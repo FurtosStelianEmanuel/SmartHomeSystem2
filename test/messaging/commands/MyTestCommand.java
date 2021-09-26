@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package smarthomesystem.commands;
+package messaging.commands;
 
 import messaging.Command;
 
@@ -11,13 +11,12 @@ import messaging.Command;
  *
  * @author Manel
  */
-public class DoorOpenedCommand extends Command{
-    
-    public DoorOpenedCommand(byte identifier) {
-        super(identifier);
-    }
-    
-    public DoorOpenedCommand(byte[] rawData){
+public class MyTestCommand extends Command {
+
+    int number;
+
+    public MyTestCommand(byte[] rawData) {
         super(rawData[0]);
+        number = Byte.toUnsignedInt(rawData[1]);
     }
 }

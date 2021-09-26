@@ -5,7 +5,6 @@
  */
 package smarthomesystem.commandhandlers;
 
-import messaging.Response;
 import smarthomesystem.commands.DoorOpenedCommand;
 
 /**
@@ -13,5 +12,5 @@ import smarthomesystem.commands.DoorOpenedCommand;
  * @author Manel
  */
 public interface ArduinoPeripheralsCommandHandlerInterface {
-    Response handle(DoorOpenedCommand command);
+    void handle(DoorOpenedCommand command);
 }

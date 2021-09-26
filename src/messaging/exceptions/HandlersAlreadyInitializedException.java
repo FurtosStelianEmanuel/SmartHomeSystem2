@@ -3,15 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package messaging;
+package messaging.exceptions;
 
 /**
  *
  * @author Manel
  */
-public abstract class QueryResult extends Message {
-
-    public QueryResult(byte identifier) {
-        super(identifier);
-    }
+public class HandlersAlreadyInitializedException extends Exception{
+    
 }

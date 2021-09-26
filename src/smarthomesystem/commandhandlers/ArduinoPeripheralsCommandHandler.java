@@ -8,9 +8,7 @@ package smarthomesystem.commandhandlers;
 import messaging.CommandHandler;
 import messaging.MessageBroker;
 import messaging.MessageFactory;
-import messaging.Response;
 import smarthomesystem.commands.DoorOpenedCommand;
-import smarthomesystem.commands.responses.DoorOpenedCommandResponse;
 
 /**
  *
@@ -27,9 +25,7 @@ public class ArduinoPeripheralsCommandHandler extends CommandHandler implements 
     }
 
     @Override
-    public Response handle(DoorOpenedCommand command) {
+    public void handle(DoorOpenedCommand command) {
         System.out.println("fac handle la ceva");
-        
-        return messageFactory.createReflectiveInstance(DoorOpenedCommandResponse.class);
     }
 }

@@ -5,21 +5,32 @@
  */
 package messaging;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javafx.util.Pair;
+import messaging.commands.MyTestCommand;
+import messaging.exceptions.PackingNotImplementedException;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import org.junit.Test;
+import org.mockito.Mockito;
 import static org.mockito.Mockito.when;
+import smarthomesystem.TestUtils;
 
 /**
  *
  * @author Manel
  */
-public class MessageDispatcherTest {
+public class MessageDispatcherTest extends TestUtils {
 
     MessageDispatcher messageDispatcher;
 
@@ -228,5 +239,31 @@ public class MessageDispatcherTest {
 
         verify(myListener).setIdentifier((byte) 69);
         assertEquals(1, messageDispatcher.getListeners().size());
+    }
+
+    public static class MyCommandHandler extends CommandHandler {
+
+        public void handle(MyTestCommand command) {
+        }
+    }
+
+    @Test
+    public void callHandlers_commandReceived_commandDispatchedToHandlers() throws NoSuchMethodException {
+        MyCommandHandler myCommandHandler = mock(MyCommandHandler.class);
+        byte[] byteRepresentation = new byte[]{(byte) 13, (byte) 12};
+
+        MyTestCommand myCommand = new MyTestCommand(byteRepresentation);
+        Method myHandleMethod = myCommandHandler.getClass().getMethod("handle", MyTestCommand.class);
+
+        Map<Class<? extends Message>, Pair<CommandHandler, Method>> commandHandlers = new HashMap<>();
+        commandHandlers.put(MyTestCommand.class, new Pair(myCommandHandler, myHandleMethod));
+
+        when(messageUtilsMock.unpack(byteRepresentation)).thenReturn(myCommand);
+
+        messageDispatcher.setCommandHandlers(commandHandlers);
+        messageDispatcher.setMessageToDispatch(byteRepresentation);
+        messageDispatcher.dispatchMessages();
+
+        verify(myCommandHandler).handle(myCommand);
     }
 }

@@ -35,8 +35,6 @@ public class MessageUtils {
             if (Misc.LOGGING_GUARD_OUTPUT_BUFFER_CLEARED) {
                 Logger.getLogger(Message.class.getName()).log(Level.SEVERE, null, ex);
             }
-        }catch(NullPointerException ex){
-            System.out.println("nem iou");
         }
 
         return (T) message;

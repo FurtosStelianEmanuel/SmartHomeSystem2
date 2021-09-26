@@ -86,8 +86,8 @@ public class MessageDispatcher {
         }
 
         Reflections reflections = container.resolveDependencies(Reflections.class);
-        Set<Class<? extends CommandHandler>> commandHandlersClasses = reflections.getSubTypesOf(CommandHandler.class);
-        Iterator<Class<? extends CommandHandler>> iterator = commandHandlersClasses.iterator();
+        Set<Class<? extends CommandHandler>> commandHandlerDescendants = reflections.getSubTypesOf(CommandHandler.class);
+        Iterator<Class<? extends CommandHandler>> iterator = commandHandlerDescendants.iterator();
         while (iterator.hasNext()) {
             Class<? extends CommandHandler> next = iterator.next();
             CommandHandler commandHandler = container.resolveDependencies(next);

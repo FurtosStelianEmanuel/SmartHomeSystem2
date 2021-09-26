@@ -21,6 +21,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.logging.Level;
@@ -53,6 +54,7 @@ import messaging.commands.TurnOffBuiltInLedCommand;
 import messaging.commands.TurnOnBuiltInLedCommand;
 import messaging.commands.responses.TurnOffBuiltInLedCommandResponse;
 import messaging.commands.responses.TurnOnBuiltInLedCommandResponse;
+import messaging.exceptions.HandlersAlreadyInitializedException;
 import org.reflections.Reflections;
 import org.reflections.scanners.SubTypesScanner;
 import org.reflections.scanners.TypeAnnotationsScanner;
@@ -76,7 +78,7 @@ public class SmartHomeSystem {
 
     public static InjectorInterface container;
 
-    void initDependencyInjection() {
+    private void initDependencyInjection() {
         try {
             MessageUtils messageUtils = new MessageUtils(new MessageIdentifierGenerator());
             MessageDispatcherWorkerFactory messageDispatcherWorkerFactory = new MessageDispatcherWorkerFactory();
@@ -98,7 +100,8 @@ public class SmartHomeSystem {
                     .addDependency(BluetoothOutputWorkerFactory.class, BluetoothOutputWorkerFactory.class)
                     .addDependency(BluetoothModuleApiWrapper.class, BluetoothModuleApiWrapper.class)
                     .addDependency(BluetoothUtils.class, BluetoothUtils.class)
-                    .addDependency(MessageBroker.class, BluetoothBroker.class);
+                    .addDependency(MessageBroker.class, BluetoothBroker.class)
+                    .addDependency(Reflections.class, new Reflections(getClass().getPackage().getName(), new SubTypesScanner(false)));
 
             container.initialise();
         } catch (InterfaceNotImplemented | ClassNotInjectable | NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException | UnresolvableDependency ex) {
@@ -107,145 +110,139 @@ public class SmartHomeSystem {
         }
     }
 
-    private void initHandlers() throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, UnresolvableDependency {
-        Reflections reflections = new Reflections(getClass().getPackage().getName(), new SubTypesScanner(false));
-        Set<Class<? extends CommandHandler>> commandHandlers = reflections.getSubTypesOf(CommandHandler.class);
-        Iterator<Class<? extends CommandHandler>> iterator = commandHandlers.iterator();
-        while(iterator.hasNext()){
-            Class<? extends CommandHandler> next = iterator.next();
-            container.resolveDependencies(next);
+    private void initHandlers() throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, UnresolvableDependency, HandlersAlreadyInitializedException {
+        container.resolveDependencies(MessageDispatcher.class).initHandlers();
+    }
+    
+    void initSmartHomeSystem() throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, UnresolvableDependency, HandlersAlreadyInitializedException {
+        try {
+            initDependencyInjection();
+            initHandlers();
+        } catch (IllegalArgumentException ex) {
+            Logger.getLogger(SmartHomeSystem.class.getName()).log(Level.SEVERE, null, ex);
+            System.exit(0);
         }
     }
 
-    void initSmartHomeSystem() {
-        try {
-            MessageBroker broker = container.resolveDependencies(BluetoothBroker.class);
-            BrokerConfig config = new BluetoothConfig() {
-                {
-                    setAddress("98D311F85C34");
-                }
-            };
-            initHandlers();
-            broker.initConnection(config);
-            broker.startBackgroundWorkers();
-            JFrame f = new JFrame();
-            f.setLayout(new FlowLayout());
-            JButton b = new JButton("Apasa ma");
-            CommsTester tester = new CommsTester(
-                    broker,
-                    container.resolveDependencies(MessageFactory.class),
-                    container.resolveDependencies(MessageDispatcher.class),
-                    16,
-                    63);
-            b.addActionListener(new ActionListener() {
-                boolean runQuery = false;
-                int count = 4;
-                int timeout = 125;
+    public static void main(String[] args) throws IOException, ThreadNotFoundException, ThreadAlreadyStartedException, IllegalArgumentException, IllegalAccessException, PackingNotImplementedException, InterfaceNotImplemented, ClassNotInjectable, NoSuchMethodException, NoSuchMethodException, NoSuchMethodException, InstantiationException, InvocationTargetException, UnresolvableDependency, ClassNotInjectable, HandlersAlreadyInitializedException {
+        SmartHomeSystem smartHomeSystem = new SmartHomeSystem();
+        smartHomeSystem.initSmartHomeSystem();
 
-                @Override
-                public void actionPerformed(ActionEvent ae) {
+        MessageBroker broker = container.resolveDependencies(BluetoothBroker.class);
+        BrokerConfig config = new BluetoothConfig() {
+            {
+                setAddress("98D311F85C34");
+            }
+        };
+        broker.initConnection(config);
+        broker.startBackgroundWorkers();
+        JFrame f = new JFrame();
+        f.setLayout(new FlowLayout());
+        JButton b = new JButton("Apasa ma");
+        CommsTester tester = new CommsTester(
+                broker,
+                container.resolveDependencies(MessageFactory.class),
+                container.resolveDependencies(MessageDispatcher.class),
+                16,
+                63);
+        b.addActionListener(new ActionListener() {
+            boolean runQuery = false;
+            int count = 4;
+            int timeout = 125;
 
-                    try {
-                        MessageFactory messageFactory = container.resolveDependencies(MessageFactory.class);
+            @Override
+            public void actionPerformed(ActionEvent ae) {
 
-                        switch (count) {
-                            case 0:
-                                try {
-                                    Query query = messageFactory.createReflectiveInstance(DistanceSensorQuery.class);
-                                    broker.send(query, new ResponseListener(false, new ResponseCallback<DistanceSensorQueryResult>(DistanceSensorQueryResult.class) {
-                                        @Override
-                                        public void onResponse(DistanceSensorQueryResult commandResponse) {
-                                            System.out.println("rezultat query " + commandResponse.distance);
-                                        }
-                                    }, new TimeoutProtocol(1000) {
-                                        @Override
-                                        public void onTimeout() {
-                                            System.out.println("Timeout okkr");
-                                        }
-                                    }
-                                    ));
-                                } catch (IllegalAccessException | PackingNotImplementedException | IOException ex) {
-                                    Logger.getLogger(SmartHomeSystem.class.getName()).log(Level.SEVERE, null, ex);
-                                }
-                                break;
-                            case 1:
-                                try {
-                                    for (int i = 0; i < 10; i++) {
-                                        tester.run();
-                                    }
-                                } catch (Exception ex) {
-                                    Logger.getLogger(SmartHomeSystem.class.getName()).log(Level.SEVERE, null, ex);
-                                }
-                                break;
-                            case 2:
-                                SetSerialSettingsCommand command = messageFactory.createReflectiveInstance(SetSerialSettingsCommand.class);
-                                command.bufferSize = 64;
-                                command.timeout = timeout;
-                                timeout += 10;
-                                if (timeout > 255) {
-                                    timeout = 0;
-                                }
-                                System.out.println("am trimis timeout " + command.timeout + " zis in byte " + (byte) command.timeout);
-                                System.out.println("am trimis bufferSize " + command.bufferSize + " zis in byte" + (byte) command.bufferSize);
-                                broker.send(command, new ResponseListener(false, new ResponseCallback<SetSerialSettingsCommandResponse>(SetSerialSettingsCommandResponse.class) {
+                try {
+                    MessageFactory messageFactory = container.resolveDependencies(MessageFactory.class);
+
+                    switch (count) {
+                        case 0:
+                            try {
+                                Query query = messageFactory.createReflectiveInstance(DistanceSensorQuery.class);
+                                broker.send(query, new ResponseListener(false, new ResponseCallback<DistanceSensorQueryResult>(DistanceSensorQueryResult.class) {
                                     @Override
-                                    public void onResponse(SetSerialSettingsCommandResponse commandResponse) {
-                                        System.out.println("timeout " + commandResponse.timeoutSet + " zis in byte " + (byte) commandResponse.timeoutSet);
-                                        System.out.println("buffer " + commandResponse.bufferSizeSet + " zis in byte " + (byte) commandResponse.bufferSizeSet);
+                                    public void onResponse(DistanceSensorQueryResult commandResponse) {
+                                        System.out.println("rezultat query " + commandResponse.distance);
                                     }
                                 }, new TimeoutProtocol(1000) {
                                     @Override
                                     public void onTimeout() {
-                                        System.out.println("Timeout okaa");
+                                        System.out.println("Timeout okkr");
                                     }
-                                }));
-                                break;
-                            case 3:
-                                TurnOnBuiltInLedCommand turnOnBuiltInLed = messageFactory.createReflectiveInstance(TurnOnBuiltInLedCommand.class);
-                                broker.send(turnOnBuiltInLed, new ResponseListener(new ResponseCallback<TurnOnBuiltInLedCommandResponse>(TurnOnBuiltInLedCommandResponse.class) {
-                                    @Override
-                                    public void onResponse(TurnOnBuiltInLedCommandResponse commandResponse) {
-                                        System.out.println("A aprins pin " + commandResponse.pinNumber);
-                                    }
-                                }));
-                                break;
-                            case 4:
-                                TurnOffBuiltInLedCommand turnOffBuiltInLed = messageFactory.createReflectiveInstance(TurnOffBuiltInLedCommand.class);
-                                broker.send(turnOffBuiltInLed, new ResponseListener(new ResponseCallback<TurnOffBuiltInLedCommandResponse>(TurnOffBuiltInLedCommandResponse.class) {
-                                    @Override
-                                    public void onResponse(TurnOffBuiltInLedCommandResponse commandResponse) {
-                                        System.out.println("A stins pin " + commandResponse.pinNumber);
-                                    }
-                                }));
-                            default:
-                                break;
-                        }
-                        count = (++count) % 5;
-                    } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException | UnresolvableDependency | PackingNotImplementedException | IOException ex) {
-                        Logger.getLogger(SmartHomeSystem.class.getName()).log(Level.SEVERE, null, ex);
+                                }
+                                ));
+                            } catch (IllegalAccessException | PackingNotImplementedException | IOException ex) {
+                                Logger.getLogger(SmartHomeSystem.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+                            break;
+                        case 1:
+                            try {
+                                for (int i = 0; i < 10; i++) {
+                                    tester.run();
+                                }
+                            } catch (Exception ex) {
+                                Logger.getLogger(SmartHomeSystem.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+                            break;
+                        case 2:
+                            SetSerialSettingsCommand command = messageFactory.createReflectiveInstance(SetSerialSettingsCommand.class);
+                            command.bufferSize = 64;
+                            command.timeout = timeout;
+                            timeout += 10;
+                            if (timeout > 255) {
+                                timeout = 0;
+                            }
+                            System.out.println("am trimis timeout " + command.timeout + " zis in byte " + (byte) command.timeout);
+                            System.out.println("am trimis bufferSize " + command.bufferSize + " zis in byte" + (byte) command.bufferSize);
+                            broker.send(command, new ResponseListener(false, new ResponseCallback<SetSerialSettingsCommandResponse>(SetSerialSettingsCommandResponse.class) {
+                                @Override
+                                public void onResponse(SetSerialSettingsCommandResponse commandResponse) {
+                                    System.out.println("timeout " + commandResponse.timeoutSet + " zis in byte " + (byte) commandResponse.timeoutSet);
+                                    System.out.println("buffer " + commandResponse.bufferSizeSet + " zis in byte " + (byte) commandResponse.bufferSizeSet);
+                                }
+                            }, new TimeoutProtocol(1000) {
+                                @Override
+                                public void onTimeout() {
+                                    System.out.println("Timeout okaa");
+                                }
+                            }));
+                            break;
+                        case 3:
+                            TurnOnBuiltInLedCommand turnOnBuiltInLed = messageFactory.createReflectiveInstance(TurnOnBuiltInLedCommand.class);
+                            broker.send(turnOnBuiltInLed, new ResponseListener(new ResponseCallback<TurnOnBuiltInLedCommandResponse>(TurnOnBuiltInLedCommandResponse.class) {
+                                @Override
+                                public void onResponse(TurnOnBuiltInLedCommandResponse commandResponse) {
+                                    System.out.println("A aprins pin " + commandResponse.pinNumber);
+                                }
+                            }));
+                            break;
+                        case 4:
+                            TurnOffBuiltInLedCommand turnOffBuiltInLed = messageFactory.createReflectiveInstance(TurnOffBuiltInLedCommand.class);
+                            broker.send(turnOffBuiltInLed, new ResponseListener(new ResponseCallback<TurnOffBuiltInLedCommandResponse>(TurnOffBuiltInLedCommandResponse.class) {
+                                @Override
+                                public void onResponse(TurnOffBuiltInLedCommandResponse commandResponse) {
+                                    System.out.println("A stins pin " + commandResponse.pinNumber);
+                                }
+                            }));
+                        default:
+                            break;
                     }
+                    count = (++count) % 5;
+                } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException | UnresolvableDependency | PackingNotImplementedException | IOException ex) {
+                    Logger.getLogger(SmartHomeSystem.class.getName()).log(Level.SEVERE, null, ex);
                 }
-            });
+            }
+        });
 
-            JButton exit = new JButton("iesi acasa");
-            exit.addActionListener((ActionEvent ae) -> {
+        JButton exit = new JButton("iesi acasa");
+        exit.addActionListener((ActionEvent ae) -> {
 
-            });
-            f.add(exit);
-            f.add(b);
-            f.setSize(200, 200);
-            f.setVisible(true);
-            f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException | UnresolvableDependency | IOException | IllegalArgumentException | PackingNotImplementedException | ThreadNotFoundException | ThreadAlreadyStartedException ex) {
-            Logger.getLogger(SmartHomeSystem.class.getName()).log(Level.SEVERE, null, ex);
-            System.exit(0);
-        }
-
-    }
-
-    public static void main(String[] args) throws IOException, ThreadNotFoundException, ThreadAlreadyStartedException, IllegalArgumentException, IllegalAccessException, PackingNotImplementedException, InterfaceNotImplemented, ClassNotInjectable, NoSuchMethodException, NoSuchMethodException, NoSuchMethodException, InstantiationException, InvocationTargetException, UnresolvableDependency, ClassNotInjectable {
-        SmartHomeSystem smartHomeSystem = new SmartHomeSystem();
-        smartHomeSystem.initDependencyInjection();
-        smartHomeSystem.initSmartHomeSystem();
+        });
+        f.add(exit);
+        f.add(b);
+        f.setSize(200, 200);
+        f.setVisible(true);
+        f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 }

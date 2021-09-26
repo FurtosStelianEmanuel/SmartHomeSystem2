@@ -25,19 +25,26 @@ public class MessageUtils {
         this.messageIdentifierGenerator = messageIdentifierGenerator;
     }
 
-    public <T extends Message> T unpack(byte[] serialisedMessage, Class type) {
+    public <T extends Message> T unpack(byte[] serializedMessage, Class type) {
         T message = (T) new Message(messageIdentifierGenerator.getIdentifier(type)) {
         };
         try {
             Constructor constructor = type.getConstructor(new Class[]{byte[].class});
-            message = (T) constructor.newInstance(serialisedMessage);
+            message = (T) constructor.newInstance(serializedMessage);
         } catch (IllegalAccessException | IllegalArgumentException | InstantiationException | NoSuchMethodException | SecurityException | InvocationTargetException ex) {
             if (Misc.LOGGING_GUARD_OUTPUT_BUFFER_CLEARED) {
                 Logger.getLogger(Message.class.getName()).log(Level.SEVERE, null, ex);
             }
+        }catch(NullPointerException ex){
+            System.out.println("nem iou");
         }
 
         return (T) message;
+    }
+
+    public <T extends Message> T unpack(byte[] serializedMessage) {
+        Class<Message> c = messageIdentifierGenerator.getClassFromIdentifier(serializedMessage[0]);
+        return unpack(serializedMessage, c);
     }
 
     public boolean isUnpackable(byte[] data) {

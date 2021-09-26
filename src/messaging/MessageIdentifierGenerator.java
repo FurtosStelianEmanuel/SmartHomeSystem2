@@ -7,7 +7,9 @@ package messaging;
 
 import annotations.Injectable;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 import messaging.commands.ClearOutputBufferCommand;
 import messaging.commands.TestCommsCommand;
 import messaging.commands.TurnOffBuiltInLedCommand;
@@ -16,7 +18,9 @@ import messaging.commands.responses.ClearOutputBufferCommandResponse;
 import messaging.commands.responses.TestCommsCommandResponse;
 import messaging.commands.responses.TurnOffBuiltInLedCommandResponse;
 import messaging.commands.responses.TurnOnBuiltInLedCommandResponse;
+import smarthomesystem.commands.DoorOpenedCommand;
 import smarthomesystem.commands.SetSerialSettingsCommand;
+import smarthomesystem.commands.responses.DoorOpenedCommandResponse;
 import smarthomesystem.commands.responses.SetSerialSettingsCommandResponse;
 import smarthomesystem.queries.DistanceSensorQuery;
 import smarthomesystem.queries.results.DistanceSensorQueryResult;
@@ -29,7 +33,7 @@ import smarthomesystem.queries.results.DistanceSensorQueryResult;
 public class MessageIdentifierGenerator {
 
     private byte currentId = -128;
-    private final Map<Class, Byte> IDENTIFIERS = new HashMap<Class, Byte>() {
+    private final Map<Class, Byte> identifiers = new HashMap<Class, Byte>() {
         {
             put(ClearOutputBufferCommand.class, getNext());
             put(ClearOutputBufferCommandResponse.class, getNext());
@@ -41,24 +45,42 @@ public class MessageIdentifierGenerator {
             put(SetSerialSettingsCommandResponse.class, getNext());
             put(TurnOnBuiltInLedCommand.class, getNext());
             put(TurnOnBuiltInLedCommandResponse.class, getNext());
-            put(TurnOffBuiltInLedCommand.class,getNext());
-            put(TurnOffBuiltInLedCommandResponse.class,getNext());
+            put(TurnOffBuiltInLedCommand.class, getNext());
+            put(TurnOffBuiltInLedCommandResponse.class, getNext());
+            put(DoorOpenedCommand.class, getNext());
+            put(DoorOpenedCommandResponse.class, getNext());
         }
     };
+    private final Map<Byte, Class> reversedIdentifiers;
+
+    public MessageIdentifierGenerator() {
+        reversedIdentifiers = new HashMap<>();
+        for (Entry<Class, Byte> entry : identifiers.entrySet()) {
+            reversedIdentifiers.put(entry.getValue(), entry.getKey());
+        }
+    }
+
+    public Class getClassFromIdentifier(byte identifier) {
+        if (!reversedIdentifiers.containsKey(identifier)) {
+            return null;
+        }
+
+        return reversedIdentifiers.get(identifier);
+    }
 
     public synchronized byte getNext() {
         return currentId++;
     }
 
     public byte getIdentifier(Class message) {
-        if (!IDENTIFIERS.containsKey(message)) {
+        if (!identifiers.containsKey(message)) {
             return 0;
         }
 
-        return IDENTIFIERS.get(message);
+        return identifiers.get(message);
     }
 
     public boolean identifierExists(byte identifier) {
-        return IDENTIFIERS.containsValue(identifier);
+        return identifiers.containsValue(identifier);
     }
 }

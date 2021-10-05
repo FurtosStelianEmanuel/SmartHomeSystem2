@@ -13,10 +13,8 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 import javafx.util.Pair;
 import messaging.events.Event;
-import messaging.events.EventDispatcher;
 import messaging.exceptions.NoHandlerForEventException;
 import threading.BackgroundWorker;
 

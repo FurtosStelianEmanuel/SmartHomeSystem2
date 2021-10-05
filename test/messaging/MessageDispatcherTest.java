@@ -11,18 +11,12 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.util.Pair;
 import messaging.commands.MyTestCommand;
-import messaging.exceptions.PackingNotImplementedException;
-import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import org.junit.Test;
-import org.mockito.Mockito;
 import static org.mockito.Mockito.when;
 import smarthomesystem.TestUtils;
 

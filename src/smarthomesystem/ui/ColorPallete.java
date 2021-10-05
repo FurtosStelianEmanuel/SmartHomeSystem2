@@ -9,7 +9,6 @@ import annotations.Injectable;
 import java.awt.Color;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.BorderFactory;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import smarthomesystem.ui.frames.connection.ConnectionFrame;

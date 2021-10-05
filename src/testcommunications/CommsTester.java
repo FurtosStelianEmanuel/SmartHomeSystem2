@@ -6,7 +6,6 @@
 package testcommunications;
 
 import java.io.IOException;
-import java.util.Arrays;
 import messaging.MessageBroker;
 import messaging.MessageDispatcher;
 import messaging.MessageFactory;

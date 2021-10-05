@@ -17,8 +17,6 @@ import java.util.Map;
 import java.util.Set;
 import javafx.util.Pair;
 import javassist.Modifier;
-import messaging.CommandHandler;
-import messaging.Message;
 import messaging.events.threading.EventDispatcherWorker;
 import org.reflections.Reflections;
 import static smarthomesystem.SmartHomeSystem.container;

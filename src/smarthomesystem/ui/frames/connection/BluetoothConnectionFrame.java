@@ -15,7 +15,6 @@ import java.util.logging.Logger;
 import javafx.util.Pair;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.table.DefaultTableModel;
-import smarthomesystem.SmartHomeSystem;
 import smarthomesystem.ui.ColorPallete;
 import smarthomesystem.ui.ServiceableFrame;
 import smarthomesystem.ui.services.connection.BluetoothConnectionFrameService;

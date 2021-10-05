@@ -12,7 +12,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import messaging.commands.responses.ClearOutputBufferCommandResponse;
 import messaging.exceptions.CannotUnpackByteArrayException;
-import misc.Misc;
 
 /**
  *

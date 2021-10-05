@@ -11,17 +11,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import messaging.MessageDispatcher;
 import messaging.MessageFactory;
-import messaging.ResponseCallback;
-import messaging.ResponseListener;
-import messaging.TimeoutProtocol;
 import messaging.commands.ClearOutputBufferCommand;
 import messaging.commands.responses.ClearOutputBufferCommandResponse;
-import messaging.exceptions.BufferNotClearedException;
 import messaging.exceptions.PackingNotImplementedException;
-import misc.Misc;
-import messaging.HotwiredDataStream;
 import messaging.HotwiredDataStreamAdapter;
-import messaging.bluetooth.threading.BluetoothInputWorker;
 import messaging.exceptions.CannotUnpackByteArrayException;
 
 /**

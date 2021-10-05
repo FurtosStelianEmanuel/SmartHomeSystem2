@@ -51,7 +51,7 @@ public class BluetoothUtils {
                 try {
                     ClearOutputBufferCommandResponse clearOutputBufferCommandResponse = new ClearOutputBufferCommandResponse(data);
                     if (clearOutputBufferCommandResponse.hasBadBytes()) {
-                        Logger.getLogger(BluetoothUtils.class.getName()).log(Level.INFO, String.format("Bluetooth buffer cleared"));
+                        Logger.getLogger(BluetoothUtils.class.getName()).log(Level.INFO, String.format("Bluetooth buffer needs to be cleared"));
                     }
 
                     messageDispatcher.disableHotWire();

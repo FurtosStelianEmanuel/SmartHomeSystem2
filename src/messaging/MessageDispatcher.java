@@ -84,15 +84,6 @@ public class MessageDispatcher {
         }
     }
 
-    private void regularDispatch() {
-        try {
-            callHandler();
-            callResponseListeners();
-        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
-            Logger.getLogger(MessageDispatcher.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
-
     public void addListener(ResponseListener responseListener) {
         responseListener.setIdentifier(messageUtils.getMessageIdentifierGenerator().getIdentifier(responseListener.getCallback().getType()));
         listeners.add(responseListener);
@@ -117,6 +108,27 @@ public class MessageDispatcher {
         }
     }
 
+    private void regularDispatch() {
+        try {
+            callHandlers();
+            callResponseListeners();
+        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
+            Logger.getLogger(MessageDispatcher.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    private void callHandlers() throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+        Message unpacked = messageUtils.unpack(messageToDispatch);
+        if (unpacked == null) {
+            return;
+        }
+
+        if (commandHandlers.containsKey(unpacked.getClass())) {
+            Pair<CommandHandler, Method> handler = commandHandlers.get(unpacked.getClass());
+            handler.getValue().invoke(handler.getKey(), unpacked);
+        }
+    }
+
     private void callResponseListeners() {
         for (int i = 0; i < listeners.size(); i++) {
             ResponseListener listener = listeners.get(i);
@@ -127,18 +139,6 @@ public class MessageDispatcher {
         }
 
         cleanupListeners();
-    }
-
-    private void callHandler() throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
-        Message unpacked = messageUtils.unpack(messageToDispatch);
-        if (unpacked == null) {
-            return;
-        }
-
-        if (commandHandlers.containsKey(unpacked.getClass())) {
-            Pair<CommandHandler, Method> handler = commandHandlers.get(unpacked.getClass());
-            handler.getValue().invoke(handler.getKey(), unpacked);
-        }
     }
 
     private void callWaitingListener(ResponseListener listener, byte[] rawData) {

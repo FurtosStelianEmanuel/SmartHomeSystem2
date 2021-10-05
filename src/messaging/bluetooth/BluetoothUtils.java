@@ -6,7 +6,9 @@
 package messaging.bluetooth;
 
 import annotations.Injectable;
+import banana.exceptions.UnresolvableDependency;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import messaging.MessageDispatcher;
@@ -16,6 +18,7 @@ import messaging.commands.responses.ClearOutputBufferCommandResponse;
 import messaging.exceptions.PackingNotImplementedException;
 import messaging.HotwiredDataStreamAdapter;
 import messaging.exceptions.CannotUnpackByteArrayException;
+import static smarthomesystem.SmartHomeSystem.container;
 
 /**
  *
@@ -24,22 +27,25 @@ import messaging.exceptions.CannotUnpackByteArrayException;
 @Injectable
 public class BluetoothUtils {
 
-    private MessageFactory messageFactory;
-    private BluetoothBroker bluetoothBroker;
-    private MessageDispatcher messageDispatcher;
+    private final MessageFactory messageFactory;
+    private final MessageDispatcher messageDispatcher;
 
-    public void setup(
-            MessageFactory messageFactory,
-            BluetoothBroker bluetoothBroker,
-            MessageDispatcher messageDispatcher
-    ) {
-        this.messageDispatcher = messageDispatcher;
+    private BluetoothBroker bluetoothBroker;
+
+    public BluetoothUtils(MessageFactory messageFactory, MessageDispatcher messageDispatcher) {
         this.messageFactory = messageFactory;
-        this.bluetoothBroker = bluetoothBroker;
+        this.messageDispatcher = messageDispatcher;
     }
 
     public void clearArduinoCommunication() {
-        HotwiredDataStreamAdapter hotwiredDataStreamAdapter = new HotwiredDataStreamAdapter(100000) {
+        try {
+            bluetoothBroker = container.resolveDependencies(BluetoothBroker.class);
+        } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException | UnresolvableDependency ex) {
+            Logger.getLogger(BluetoothUtils.class.getName()).log(Level.SEVERE, null, ex);
+            return;
+        }
+        
+        HotwiredDataStreamAdapter hotwiredDataStreamAdapter = new HotwiredDataStreamAdapter(10000) {
             @Override
             public void onHotwiredResponse(byte[] data) {
                 try {
@@ -47,7 +53,7 @@ public class BluetoothUtils {
                     if (clearOutputBufferCommandResponse.hasBadBytes()) {
                         Logger.getLogger(BluetoothUtils.class.getName()).log(Level.INFO, String.format("Bluetooth buffer cleared"));
                     }
-                    
+
                     messageDispatcher.disableHotWire();
                     bluetoothBroker.clearInputBuffer();
                 } catch (CannotUnpackByteArrayException ex) {

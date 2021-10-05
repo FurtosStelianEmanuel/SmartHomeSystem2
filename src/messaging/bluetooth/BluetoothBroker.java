@@ -83,8 +83,6 @@ public class BluetoothBroker extends MessageBroker<BluetoothConfig, EncodingAlgo
         threadPoolSupervisor.startThread(outputWorker);
         threadPoolSupervisor.startThread(inputWorker);
         threadPoolSupervisor.startThread(messageDispatcherWorker);
-
-        bluetoothUtils.setup(messageFactory, this, messageDispatcher);
     }
 
     @Override

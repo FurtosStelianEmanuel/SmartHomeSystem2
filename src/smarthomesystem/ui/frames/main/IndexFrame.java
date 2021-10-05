@@ -92,7 +92,11 @@ public class IndexFrame extends ServiceableFrame<IndexFrameService> {
     }//GEN-LAST:event_jSlider1StateChanged
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        service.getLightAmount();
+        try {
+            service.getLightAmount();
+        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | InstantiationException | UnresolvableDependency | PackingNotImplementedException | IOException ex) {
+            Logger.getLogger(IndexFrame.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }//GEN-LAST:event_jButton1ActionPerformed
     
     // Variables declaration - do not modify//GEN-BEGIN:variables

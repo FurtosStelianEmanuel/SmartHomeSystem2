@@ -48,18 +48,6 @@ public class MessageDispatcherTest extends TestUtils {
     }
 
     @Test
-    public void queueMessage_queuePartialMessage_workerThreadNotifiedWithNewData() {
-        byte[] messageToDispatch = new byte[]{(byte) -127, (byte) 2};
-        messageDispatcher.queueMessage(messageToDispatch);
-        messageDispatcher.queuePartialMessage(messageToDispatch);
-
-        assertArrayEquals(messageToDispatch, messageDispatcher.getMessageToDispatch());
-        assertArrayEquals(messageToDispatch, messageDispatcher.getPartialMessageToDispatch());
-
-        //verify(specialMessageDispatcherWorkerMock, times(2)).notify(); // not behaving correctly due to synchronized block
-    }
-
-    @Test
     public void dispatchMessages_when_persistentListenerPresent_messageSent_listenerNotRemoved_listenerResponseReceivedSetToTrue() {
         class MyMessage extends Response {
 
@@ -76,7 +64,6 @@ public class MessageDispatcherTest extends TestUtils {
 
         messageDispatcher.setListeners(listeners);
         messageDispatcher.setMessageToDispatch(messageToDispatch);
-        messageDispatcher.setPartialMessagesEnabled(false);
 
         when(myListener.getIdentifier()).thenReturn((byte) 69);
         when(myListener.getCallback()).thenReturn(myCallback);
@@ -106,7 +93,6 @@ public class MessageDispatcherTest extends TestUtils {
 
         messageDispatcher.setListeners(listeners);
         messageDispatcher.setMessageToDispatch(messageToDispatch);
-        messageDispatcher.setPartialMessagesEnabled(false);
 
         when(myListener.timeoutOccured()).thenReturn(true);
         when(myListener.getIdentifier()).thenReturn((byte) 69);
@@ -137,77 +123,11 @@ public class MessageDispatcherTest extends TestUtils {
 
         messageDispatcher.setListeners(listeners);
         messageDispatcher.setMessageToDispatch(messageToDispatch);
-        messageDispatcher.setPartialMessagesEnabled(false);
 
         when(myListener.getIdentifier()).thenReturn((byte) 69);
         when(myListener.getCallback()).thenReturn(myCallback);
         when(myListener.isPersistent()).thenReturn(false);
         when(myCallback.getType()).thenReturn(MyMessage.class);
-        when(messageUtilsMock.unpack(messageToDispatch, MyMessage.class)).thenReturn(expectedDeserializedMessage);
-
-        messageDispatcher.dispatchMessages();
-
-        verify(myCallback).onResponse(expectedDeserializedMessage);
-        assertEquals(0, messageDispatcher.getListeners().size());
-    }
-
-    @Test
-    public void dispatchMessage_when_persistentListenerPresent_partialMessageSent_listenerNotDeleted() {
-        class MyMessage extends Response {
-
-            public MyMessage(byte[] rawData) {
-                super(rawData[0]);
-            }
-        }
-
-        byte[] messageToDispatch = new byte[]{69};
-        MyMessage expectedDeserializedMessage = new MyMessage(messageToDispatch);
-        ResponseListener myListener = mock(ResponseListener.class);
-        ResponseCallback myCallback = mock(ResponseCallback.class);
-        List<ResponseListener> listeners = Arrays.asList(myListener);
-
-        messageDispatcher.setListeners(listeners);
-        messageDispatcher.setPartialMessageToDispatch(messageToDispatch);
-        messageDispatcher.setPartialMessagesEnabled(true);
-
-        when(myListener.getIdentifier()).thenReturn((byte) 69);
-        when(myListener.getCallback()).thenReturn(myCallback);
-        when(myListener.isPersistent()).thenReturn(true);
-        when(myCallback.getType()).thenReturn(MyMessage.class);
-        when(messageUtilsMock.isUnpackable(messageToDispatch)).thenReturn(true);
-        when(messageUtilsMock.unpack(messageToDispatch, MyMessage.class)).thenReturn(expectedDeserializedMessage);
-
-        messageDispatcher.dispatchMessages();
-
-        verify(myCallback).onResponse(expectedDeserializedMessage);
-        assertEquals(1, messageDispatcher.getListeners().size());
-    }
-
-    @Test
-    public void dispatchMessage_when_nonPersistentListenerPresent_partialMessageSent_listenerDeleted() {
-        class MyMessage extends Response {
-
-            public MyMessage(byte[] rawData) {
-                super(rawData[0]);
-            }
-        }
-
-        byte[] messageToDispatch = new byte[]{69};
-        MyMessage expectedDeserializedMessage = new MyMessage(messageToDispatch);
-        ResponseListener myListener = mock(ResponseListener.class);
-        ResponseCallback myCallback = mock(ResponseCallback.class);
-        List<ResponseListener> listeners = new ArrayList<>();
-        listeners.add(myListener);
-
-        messageDispatcher.setListeners(listeners);
-        messageDispatcher.setPartialMessageToDispatch(messageToDispatch);
-        messageDispatcher.setPartialMessagesEnabled(true);
-
-        when(myListener.getIdentifier()).thenReturn((byte) 69);
-        when(myListener.getCallback()).thenReturn(myCallback);
-        when(myListener.isPersistent()).thenReturn(false);
-        when(myCallback.getType()).thenReturn(MyMessage.class);
-        when(messageUtilsMock.isUnpackable(messageToDispatch)).thenReturn(true);
         when(messageUtilsMock.unpack(messageToDispatch, MyMessage.class)).thenReturn(expectedDeserializedMessage);
 
         messageDispatcher.dispatchMessages();

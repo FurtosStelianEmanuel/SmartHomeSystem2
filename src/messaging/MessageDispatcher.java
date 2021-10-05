@@ -162,9 +162,6 @@ public class MessageDispatcher {
         }
     }
 
-//    public void setPartialMessagesEnabled(boolean partialMessagesEnabled) {
-//        this.partialMessagesEnabled = partialMessagesEnabled;
-//    }
     public List<ResponseListener> getListeners() {
         return listeners;
     }

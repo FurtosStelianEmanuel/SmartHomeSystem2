@@ -6,9 +6,7 @@
 package smarthomesystem.ui.frames.connection;
 
 import annotations.Injectable;
-import banana.exceptions.UnresolvableDependency;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;

@@ -6,9 +6,7 @@
 package smarthomesystem.ui.services.main;
 
 import annotations.Injectable;
-import banana.exceptions.UnresolvableDependency;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import messaging.MessageDispatcher;
 import messaging.MessageFactory;
 import messaging.ResponseCallback;

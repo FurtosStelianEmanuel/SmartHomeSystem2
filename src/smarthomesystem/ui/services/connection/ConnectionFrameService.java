@@ -6,9 +6,7 @@
 package smarthomesystem.ui.services.connection;
 
 import annotations.Injectable;
-import banana.exceptions.UnresolvableDependency;
 import java.awt.event.ActionEvent;
-import java.lang.reflect.InvocationTargetException;
 import smarthomesystem.ui.frames.connection.ConnectionFrame;
 import smarthomesystem.ui.services.FrameService;
 import static smarthomesystem.SmartHomeSystem.container;

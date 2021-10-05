@@ -6,8 +6,6 @@
 package messaging.events;
 
 import annotations.Injectable;
-import banana.exceptions.UnresolvableDependency;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;

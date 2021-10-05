@@ -6,10 +6,6 @@
 package smarthomesystem.ui.services.connection;
 
 import annotations.Injectable;
-import banana.exceptions.UnresolvableDependency;
-import java.lang.reflect.InvocationTargetException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.util.Pair;
 import messaging.ConnectionListener;
 import messaging.ConnectionService;
@@ -79,5 +75,4 @@ public class BluetoothConnectingFrameService extends FrameService<BluetoothConne
         connectionService.setRetryPolicy(new RetryConnectionPolicy(3));
         connectionService.connectTo(bluetoothConfig, BluetoothBroker.class);
     }
-
 }

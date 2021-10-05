@@ -5,7 +5,6 @@
  */
 package smarthomesystem;
 
-import annotations.Injectable;
 import banana.Injector;
 import banana.InjectorInterface;
 import banana.exceptions.ClassNotInjectable;
@@ -16,7 +15,6 @@ import data.SerializationUtils;
 import encoding.EncodingAlgorithm;
 import encoding.EncodingUtils;
 import encoding.algorithms.HammingEncoder;
-import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -35,7 +33,6 @@ import messaging.bluetooth.BluetoothModuleApiWrapper;
 import messaging.bluetooth.BluetoothUtils;
 import messaging.bluetooth.threading.factories.BluetoothInputWorkerFactory;
 import messaging.bluetooth.threading.factories.BluetoothOutputWorkerFactory;
-import messaging.exceptions.PackingNotImplementedException;
 import messaging.MessageDispatcherWorker;
 import messaging.events.EventDispatcher;
 import messaging.events.threading.EventDispatcherWorker;

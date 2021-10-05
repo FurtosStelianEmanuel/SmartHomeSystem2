@@ -20,7 +20,6 @@ import messaging.bluetooth.threading.BluetoothInputWorker;
 import messaging.bluetooth.threading.BluetoothOutputWorker;
 import messaging.bluetooth.threading.factories.BluetoothInputWorkerFactory;
 import messaging.bluetooth.threading.factories.BluetoothOutputWorkerFactory;
-import messaging.exceptions.PackingNotImplementedException;
 
 /**
  *

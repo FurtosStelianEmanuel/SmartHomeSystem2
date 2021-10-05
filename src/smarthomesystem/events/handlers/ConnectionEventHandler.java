@@ -5,8 +5,6 @@
  */
 package smarthomesystem.events.handlers;
 
-import banana.exceptions.UnresolvableDependency;
-import java.lang.reflect.InvocationTargetException;
 import messaging.bluetooth.BluetoothBroker;
 import messaging.bluetooth.BluetoothUtils;
 import messaging.events.EventHandler;

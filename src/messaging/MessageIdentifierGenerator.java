@@ -7,22 +7,28 @@ package messaging;
 
 import annotations.Injectable;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import messaging.commands.ClearOutputBufferCommand;
 import messaging.commands.TestCommsCommand;
 import messaging.commands.TurnOffBuiltInLedCommand;
 import messaging.commands.TurnOnBuiltInLedCommand;
 import messaging.commands.responses.ClearOutputBufferCommandResponse;
+import messaging.commands.responses.GenericCommandResponse;
 import messaging.commands.responses.TestCommsCommandResponse;
 import messaging.commands.responses.TurnOffBuiltInLedCommandResponse;
 import messaging.commands.responses.TurnOnBuiltInLedCommandResponse;
+import messaging.exceptions.CannotUnpackByteArrayException;
 import smarthomesystem.commands.DoorOpenedCommand;
+import smarthomesystem.commands.ModulatePulseWidthCommand;
 import smarthomesystem.commands.SetSerialSettingsCommand;
 import smarthomesystem.commands.responses.DoorOpenedCommandResponse;
 import smarthomesystem.commands.responses.SetSerialSettingsCommandResponse;
+import smarthomesystem.queries.AnalogValueQuery;
 import smarthomesystem.queries.DistanceSensorQuery;
+import smarthomesystem.queries.results.AnalogValueQueryResult;
 import smarthomesystem.queries.results.DistanceSensorQueryResult;
 
 /**
@@ -49,6 +55,10 @@ public class MessageIdentifierGenerator {
             put(TurnOffBuiltInLedCommandResponse.class, getNext());
             put(DoorOpenedCommand.class, getNext());
             put(DoorOpenedCommandResponse.class, getNext());
+            put(ModulatePulseWidthCommand.class, getNext());
+            put(GenericCommandResponse.class, getNext());
+            put(AnalogValueQuery.class, getNext());
+            put(AnalogValueQueryResult.class, getNext());
         }
     };
     private final Map<Byte, Class> reversedIdentifiers;
@@ -60,7 +70,7 @@ public class MessageIdentifierGenerator {
         }
     }
 
-    public Class getClassFromIdentifier(byte identifier) {
+    public Class getTypeFromIdentifier(byte identifier) {
         if (!reversedIdentifiers.containsKey(identifier)) {
             return null;
         }

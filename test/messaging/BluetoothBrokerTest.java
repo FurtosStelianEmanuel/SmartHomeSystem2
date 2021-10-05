@@ -143,7 +143,7 @@ public class BluetoothBrokerTest extends TestUtils {
             verify(threadPoolSupervisorMock).startThread(inputWorkerMock);
             verify(threadPoolSupervisorMock).startThread(messageDispatcherWorkerMock);
 
-            verify(bluetoothUtilsMock).setup(messageFactoryMock, bluetoothBroker, inputWorkerMock, messageDispatcherMock);
+            verify(bluetoothUtilsMock).setup(messageFactoryMock, bluetoothBroker, messageDispatcherMock);
             verify(bluetoothUtilsMock).clearArduinoCommunication();
         }
     }

@@ -10,6 +10,8 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import messaging.commands.responses.ClearOutputBufferCommandResponse;
+import messaging.exceptions.CannotUnpackByteArrayException;
 import misc.Misc;
 
 /**
@@ -32,16 +34,18 @@ public class MessageUtils {
             Constructor constructor = type.getConstructor(new Class[]{byte[].class});
             message = (T) constructor.newInstance(serializedMessage);
         } catch (IllegalAccessException | IllegalArgumentException | InstantiationException | NoSuchMethodException | SecurityException | InvocationTargetException ex) {
-            if (Misc.LOGGING_GUARD_OUTPUT_BUFFER_CLEARED) {
-                Logger.getLogger(Message.class.getName()).log(Level.SEVERE, null, ex);
-            }
+            Logger.getLogger(Message.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         return (T) message;
     }
 
     public <T extends Message> T unpack(byte[] serializedMessage) {
-        Class<Message> c = messageIdentifierGenerator.getClassFromIdentifier(serializedMessage[0]);
+        Class<Message> c = messageIdentifierGenerator.getTypeFromIdentifier(serializedMessage[0]);
+        if (c == null) {
+            return null;
+        }
+
         return unpack(serializedMessage, c);
     }
 
@@ -51,7 +55,12 @@ public class MessageUtils {
                 return true;
             }
         }
+
         return false;
+    }
+
+    public ClearOutputBufferCommandResponse getClearOutputBufferCommandResponseFromBadPacket(byte[] badPacket) throws CannotUnpackByteArrayException {
+        return new ClearOutputBufferCommandResponse(badPacket);
     }
 
     public MessageIdentifierGenerator getMessageIdentifierGenerator() {

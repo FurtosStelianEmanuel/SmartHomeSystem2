@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import messaging.MessageDispatcher;
-import smarthomesystem.SmartHomeSystem;
+import messaging.HotwiredDataStream;
 
 /**
  *
@@ -42,21 +42,22 @@ public class BluetoothInputWorker extends BackgroundWorker {
         int readValue = inputStream.read();
         if (readValue != -1) {
             inputBuffer.add(readValue);
-            byte[] toDispatch;
-            if (messageDispatcher.arePartialMessagesEnabled() && inputBuffer.size() < BUFFER_SIZE) {
-                toDispatch = new byte[inputBuffer.size()];
-                for (int i = 0; i < toDispatch.length; i++) {
-                    toDispatch[i] = (byte) (int) inputBuffer.get(i);
-                }
-                messageDispatcher.queuePartialMessage(toDispatch);
-            } else if (inputBuffer.size() == BUFFER_SIZE) {
-                toDispatch = new byte[BUFFER_SIZE];
-                for (int i = 0; i < toDispatch.length; i++) {
-                    toDispatch[i] = (byte) (int) inputBuffer.get(i);
-                }
-                messageDispatcher.queueMessage(toDispatch);
-                inputBuffer.clear();
+            byte[] data = getBufferAsArray();
+            if (data.length < BUFFER_SIZE) {
+                return;
             }
+
+            messageDispatcher.queueMessage(data);
+            inputBuffer.clear();
         }
+    }
+
+    private byte[] getBufferAsArray() {
+        byte[] toReturn = new byte[inputBuffer.size()];
+        for (int i = 0; i < toReturn.length; i++) {
+            toReturn[i] = (byte) (int) inputBuffer.get(i);
+        }
+
+        return toReturn;
     }
 }

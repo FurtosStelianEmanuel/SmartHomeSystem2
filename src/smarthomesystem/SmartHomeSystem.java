@@ -10,6 +10,8 @@ import banana.InjectorInterface;
 import banana.exceptions.ClassNotInjectable;
 import banana.exceptions.InterfaceNotImplemented;
 import banana.exceptions.UnresolvableDependency;
+import data.PathProvider;
+import data.SerializationUtils;
 import encoding.EncodingAlgorithm;
 import encoding.EncodingUtils;
 import encoding.algorithms.HammingEncoder;
@@ -30,6 +32,7 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import messaging.BrokerConfig;
 import messaging.CommandHandler;
+import messaging.ConnectionService;
 import messaging.MessageBroker;
 import messaging.MessageDispatcher;
 import messaging.MessageFactory;
@@ -54,6 +57,8 @@ import messaging.commands.TurnOffBuiltInLedCommand;
 import messaging.commands.TurnOnBuiltInLedCommand;
 import messaging.commands.responses.TurnOffBuiltInLedCommandResponse;
 import messaging.commands.responses.TurnOnBuiltInLedCommandResponse;
+import messaging.events.EventDispatcher;
+import messaging.events.threading.EventDispatcherWorker;
 import messaging.exceptions.HandlersAlreadyInitializedException;
 import org.reflections.Reflections;
 import org.reflections.scanners.SubTypesScanner;
@@ -65,9 +70,21 @@ import smarthomesystem.commands.SetSerialSettingsCommand;
 import smarthomesystem.commands.responses.SetSerialSettingsCommandResponse;
 import smarthomesystem.queries.DistanceSensorQuery;
 import smarthomesystem.queries.results.DistanceSensorQueryResult;
+import smarthomesystem.ui.ColorPallete;
+import smarthomesystem.ui.ServiceableFrame;
+import smarthomesystem.ui.frames.connection.BluetoothConnectionFrame;
+import smarthomesystem.ui.frames.connection.ConnectionFrame;
+import smarthomesystem.ui.frames.connection.BluetoothConnectingFrame;
+import smarthomesystem.ui.frames.main.IndexFrame;
+import smarthomesystem.ui.services.FrameService;
+import smarthomesystem.ui.services.connection.BluetoothConnectionFrameService;
+import smarthomesystem.ui.services.connection.ConnectionFrameService;
+import smarthomesystem.ui.services.connection.BluetoothConnectingFrameService;
+import smarthomesystem.ui.services.main.IndexFrameService;
 import threading.ThreadPoolSupervisor;
 import threading.exceptions.ThreadAlreadyStartedException;
 import threading.exceptions.ThreadNotFoundException;
+import threading.factories.EventDispatcherWorkerFactory;
 import threading.factories.MessageDispatcherWorkerFactory;
 
 /**
@@ -78,17 +95,47 @@ public class SmartHomeSystem {
 
     public static InjectorInterface container;
 
+    public void initSmartHomeSystem() throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, UnresolvableDependency, HandlersAlreadyInitializedException {
+        initDependencyInjection();
+        initHandlers();
+        initDispatchers();
+        mergeFormsAndFormServices();
+    }
+
+    public void terminateSmartHomeSystem() throws InterruptedException {
+        try {
+            ThreadPoolSupervisor threadPoolSupervisor = container.resolveDependencies(ThreadPoolSupervisor.class);
+            threadPoolSupervisor.terminateAllThreads();
+            Thread.sleep(1000);
+        } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException | UnresolvableDependency ex) {
+            Logger.getLogger(SmartHomeSystem.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            System.exit(0);
+        }
+    }
+
     private void initDependencyInjection() {
         try {
             MessageUtils messageUtils = new MessageUtils(new MessageIdentifierGenerator());
             MessageDispatcherWorkerFactory messageDispatcherWorkerFactory = new MessageDispatcherWorkerFactory();
             MessageDispatcherWorker messageDispatcherWorker = messageDispatcherWorkerFactory.createNewInstance();
             MessageDispatcher messageDispatcher = new MessageDispatcher(messageUtils, messageDispatcherWorker);
+            Reflections reflections = new Reflections(
+                    getClass().getPackage().getName(),
+                    new SubTypesScanner(false)
+            );
+
+            EventDispatcherWorkerFactory eventDispatcherWorkerFactory = new EventDispatcherWorkerFactory();
+            EventDispatcherWorker eventDispatcherWorker = eventDispatcherWorkerFactory.createNewInstance();
+            EventDispatcher eventDispatcher = new EventDispatcher(reflections, eventDispatcherWorker);
 
             container = new Injector(new HashMap<>(), new HashMap<>(), new ArrayList<>());
             container
-                    .addDependency(MessageIdentifierGenerator.class, MessageIdentifierGenerator.class)
-                    .addDependency(MessageUtils.class, MessageUtils.class)
+                    .addDependency(ColorPallete.class, ColorPallete.class)
+                    .addDependency(PathProvider.class, PathProvider.class)
+                    .addDependency(ConnectionService.class, ConnectionService.class)
+                    .addDependency(SerializationUtils.class, SerializationUtils.class)
+                    .addDependency(MessageUtils.class, messageUtils)
                     .addDependency(MessageFactory.class, MessageFactory.class)
                     .addDependency(MessageDispatcherWorkerFactory.class, MessageDispatcherWorkerFactory.class)
                     .addDependency(MessageDispatcherWorker.class, messageDispatcherWorker)
@@ -96,12 +143,22 @@ public class SmartHomeSystem {
                     .addDependency(EncodingUtils.class, EncodingUtils.class)
                     .addDependency(EncodingAlgorithm.class, HammingEncoder.class)
                     .addDependency(ThreadPoolSupervisor.class, ThreadPoolSupervisor.class)
+                    .addDependency(BluetoothUtils.class, BluetoothUtils.class)
                     .addDependency(BluetoothInputWorkerFactory.class, BluetoothInputWorkerFactory.class)
                     .addDependency(BluetoothOutputWorkerFactory.class, BluetoothOutputWorkerFactory.class)
                     .addDependency(BluetoothModuleApiWrapper.class, BluetoothModuleApiWrapper.class)
-                    .addDependency(BluetoothUtils.class, BluetoothUtils.class)
                     .addDependency(MessageBroker.class, BluetoothBroker.class)
-                    .addDependency(Reflections.class, new Reflections(getClass().getPackage().getName(), new SubTypesScanner(false)));
+                    .addDependency(Reflections.class, reflections)
+                    .addDependency(EventDispatcher.class, eventDispatcher)
+                    .addDependency(EventDispatcherWorker.class, eventDispatcherWorker)
+                    .addDependency(ConnectionFrameService.class, ConnectionFrameService.class)
+                    .addDependency(ConnectionFrame.class, ConnectionFrame.class)
+                    .addDependency(BluetoothConnectionFrameService.class, BluetoothConnectionFrameService.class)
+                    .addDependency(BluetoothConnectionFrame.class, BluetoothConnectionFrame.class)
+                    .addDependency(BluetoothConnectingFrame.class, BluetoothConnectingFrame.class)
+                    .addDependency(BluetoothConnectingFrameService.class, BluetoothConnectingFrameService.class)
+                    .addDependency(IndexFrame.class, IndexFrame.class)
+                    .addDependency(IndexFrameService.class, IndexFrameService.class);
 
             container.initialise();
         } catch (InterfaceNotImplemented | ClassNotInjectable | NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException | UnresolvableDependency ex) {
@@ -112,23 +169,54 @@ public class SmartHomeSystem {
 
     private void initHandlers() throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, UnresolvableDependency, HandlersAlreadyInitializedException {
         container.resolveDependencies(MessageDispatcher.class).initHandlers();
+        container.resolveDependencies(EventDispatcher.class).init();
     }
-    
-    void initSmartHomeSystem() throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, UnresolvableDependency, HandlersAlreadyInitializedException {
+
+    private void initDispatchers() throws InstantiationException, IllegalAccessException, InvocationTargetException, UnresolvableDependency, NoSuchMethodException {
+        ThreadPoolSupervisor threadPoolSupervisor = container.resolveDependencies(ThreadPoolSupervisor.class);
+        EventDispatcher eventDispatcher = container.resolveDependencies(EventDispatcher.class);
+        EventDispatcherWorker eventDispatcherWorker = container.resolveDependencies(EventDispatcherWorker.class);
+
+        eventDispatcherWorker.setSubscribers(eventDispatcher.getEventSubscribers());
+        threadPoolSupervisor.addThread(eventDispatcherWorker);
         try {
-            initDependencyInjection();
-            initHandlers();
-        } catch (IllegalArgumentException ex) {
+            threadPoolSupervisor.startThread(eventDispatcherWorker);
+        } catch (ThreadNotFoundException | ThreadAlreadyStartedException ex) {
             Logger.getLogger(SmartHomeSystem.class.getName()).log(Level.SEVERE, null, ex);
             System.exit(0);
         }
+    }
+
+    private void mergeFormsAndFormServices() throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, UnresolvableDependency {
+        Reflections reflections = container.resolveDependencies(Reflections.class);
+        Set<Class<? extends FrameService>> frameServices = reflections.getSubTypesOf(FrameService.class);
+        Iterator iterator = frameServices.iterator();
+
+        while (iterator.hasNext()) {
+            FrameService service = container.resolveDependencies((Class<? extends FrameService>) iterator.next());
+            ServiceableFrame frame = container.resolveDependencies((Class<? extends ServiceableFrame>) service.getFrameType());
+
+            service.setFrame(frame);
+            frame.setService(service);
+        }
+    }
+
+    private void openConnectionFrame() throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, UnresolvableDependency {
+        ConnectionFrame connectionFrame = container.resolveDependencies(ConnectionFrame.class);
+
+        connectionFrame.setLocationRelativeTo(null);
+        connectionFrame.setVisible(true);
     }
 
     public static void main(String[] args) throws IOException, ThreadNotFoundException, ThreadAlreadyStartedException, IllegalArgumentException, IllegalAccessException, PackingNotImplementedException, InterfaceNotImplemented, ClassNotInjectable, NoSuchMethodException, NoSuchMethodException, NoSuchMethodException, InstantiationException, InvocationTargetException, UnresolvableDependency, ClassNotInjectable, HandlersAlreadyInitializedException {
         SmartHomeSystem smartHomeSystem = new SmartHomeSystem();
         smartHomeSystem.initSmartHomeSystem();
 
-        MessageBroker broker = container.resolveDependencies(BluetoothBroker.class);
+        smartHomeSystem.openConnectionFrame();
+    }
+
+    /*
+    MessageBroker broker = container.resolveDependencies(BluetoothBroker.class);
         BrokerConfig config = new BluetoothConfig() {
             {
                 setAddress("98D311F85C34");
@@ -139,6 +227,7 @@ public class SmartHomeSystem {
         JFrame f = new JFrame();
         f.setLayout(new FlowLayout());
         JButton b = new JButton("Apasa ma");
+        container.resolveDependencies(FormService.class).f = f;
         CommsTester tester = new CommsTester(
                 broker,
                 container.resolveDependencies(MessageFactory.class),
@@ -244,5 +333,5 @@ public class SmartHomeSystem {
         f.setSize(200, 200);
         f.setVisible(true);
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    }
+     */
 }

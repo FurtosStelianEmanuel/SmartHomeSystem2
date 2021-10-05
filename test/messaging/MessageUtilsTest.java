@@ -89,7 +89,7 @@ public class MessageUtilsTest {
     public void unpack_noTypeSent_commandDeserializedCorrectly() {
         byte[] byteRepresentation = new byte[]{(byte) 15, (byte) 10};
 
-        when(messageIdentifierGeneratorMock.getClassFromIdentifier(byteRepresentation[0])).thenReturn(MyCommand.class);
+        when(messageIdentifierGeneratorMock.getTypeFromIdentifier(byteRepresentation[0])).thenReturn(MyCommand.class);
 
         MyCommand unpackedCommand = messageUtils.unpack(byteRepresentation);
 
@@ -101,7 +101,7 @@ public class MessageUtilsTest {
     public void unpack_noTypeSent_queryDeserializedCorrectly() {
         byte[] byteRepresentation = new byte[]{(byte) 10, (byte) 12, (byte) 13};
 
-        when(messageIdentifierGeneratorMock.getClassFromIdentifier(byteRepresentation[0])).thenReturn(MyQuery.class);
+        when(messageIdentifierGeneratorMock.getTypeFromIdentifier(byteRepresentation[0])).thenReturn(MyQuery.class);
 
         MyQuery unpackedQuery = messageUtils.unpack(byteRepresentation);
 
@@ -114,7 +114,7 @@ public class MessageUtilsTest {
     public void unpack_noTypeSent_resultDeserializedCorrectly() {
         byte[] byteRepresentation = new byte[]{(byte) 10, (byte) 12};
 
-        when(messageIdentifierGeneratorMock.getClassFromIdentifier(byteRepresentation[0])).thenReturn(MyResult.class);
+        when(messageIdentifierGeneratorMock.getTypeFromIdentifier(byteRepresentation[0])).thenReturn(MyResult.class);
 
         MyResult unpackedResult = messageUtils.unpack(byteRepresentation);
 

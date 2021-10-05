@@ -28,11 +28,7 @@ public class MessageDispatcherWorker extends BackgroundWorker {
             try {
                 wait();
                 messageDispatcher.dispatchMessages();
-            } catch (InterruptedException | ClassCastException ex) {
-                if (Misc.LOGGING_GUARD_OUTPUT_BUFFER_CLEARED) {
-                    Logger.getLogger(MessageDispatcherWorker.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            } catch (ArrayIndexOutOfBoundsException ex) {
+            } catch (InterruptedException | ClassCastException | ArrayIndexOutOfBoundsException ex) {
                 Logger.getLogger(MessageDispatcherWorker.class.getName()).log(Level.SEVERE, null, ex);
             }
         }

@@ -84,13 +84,16 @@ public class BluetoothBroker extends MessageBroker<BluetoothConfig, EncodingAlgo
         threadPoolSupervisor.startThread(inputWorker);
         threadPoolSupervisor.startThread(messageDispatcherWorker);
 
-        bluetoothUtils.setup(messageFactory, this, inputWorker, messageDispatcher);
-        bluetoothUtils.clearArduinoCommunication();
+        bluetoothUtils.setup(messageFactory, this, messageDispatcher);
     }
 
     @Override
     public void closeConnection() throws IOException {
         bluetoothWrapper.disconnect();
         super.closeConnection();
+    }
+
+    void clearInputBuffer() {
+        inputWorker.clearInputBuffer();
     }
 }

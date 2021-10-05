@@ -14,12 +14,15 @@ import messaging.MessageFactory;
 import messaging.ResponseCallback;
 import messaging.ResponseListener;
 import messaging.TimeoutProtocol;
-import messaging.bluetooth.threading.BluetoothInputWorker;
 import messaging.commands.ClearOutputBufferCommand;
 import messaging.commands.responses.ClearOutputBufferCommandResponse;
 import messaging.exceptions.BufferNotClearedException;
 import messaging.exceptions.PackingNotImplementedException;
 import misc.Misc;
+import messaging.HotwiredDataStream;
+import messaging.HotwiredDataStreamAdapter;
+import messaging.bluetooth.threading.BluetoothInputWorker;
+import messaging.exceptions.CannotUnpackByteArrayException;
 
 /**
  *
@@ -30,49 +33,47 @@ public class BluetoothUtils {
 
     private MessageFactory messageFactory;
     private BluetoothBroker bluetoothBroker;
-    private BluetoothInputWorker inputWorker;
     private MessageDispatcher messageDispatcher;
 
     public void setup(
             MessageFactory messageFactory,
             BluetoothBroker bluetoothBroker,
-            BluetoothInputWorker inputWorker,
             MessageDispatcher messageDispatcher
     ) {
         this.messageDispatcher = messageDispatcher;
         this.messageFactory = messageFactory;
         this.bluetoothBroker = bluetoothBroker;
-        this.inputWorker = inputWorker;
     }
 
     public void clearArduinoCommunication() {
-        try {
-            Misc.LOGGING_GUARD_OUTPUT_BUFFER_CLEARED = false;
-            bluetoothBroker.send(messageFactory.createReflectiveInstance(ClearOutputBufferCommand.class), new ResponseListener(
-                    false,
-                    new ResponseCallback<ClearOutputBufferCommandResponse>(ClearOutputBufferCommandResponse.class) {
-                @Override
-                public void onResponse(ClearOutputBufferCommandResponse commandResponse) {
-                    inputWorker.clearInputBuffer();
-                    messageDispatcher.setPartialMessagesEnabled(false);
-                    Misc.LOGGING_GUARD_OUTPUT_BUFFER_CLEARED = true;
-                }
-            }, new TimeoutProtocol(10000) {
-                @Override
-                public void onTimeout() {
-                    if (!Misc.LOGGING_GUARD_OUTPUT_BUFFER_CLEARED) {
-                        try {
-                            throw new BufferNotClearedException();
-                        } catch (BufferNotClearedException ex) {
-                            Logger.getLogger(BluetoothBroker.class.getName()).log(Level.SEVERE, null, ex);
-                        }
-                        fatalErrorOccured();
+        HotwiredDataStreamAdapter hotwiredDataStreamAdapter = new HotwiredDataStreamAdapter(100000) {
+            @Override
+            public void onHotwiredResponse(byte[] data) {
+                try {
+                    ClearOutputBufferCommandResponse clearOutputBufferCommandResponse = new ClearOutputBufferCommandResponse(data);
+                    if (clearOutputBufferCommandResponse.hasBadBytes()) {
+                        Logger.getLogger(BluetoothUtils.class.getName()).log(Level.INFO, String.format("Bluetooth buffer cleared"));
                     }
+                    
+                    messageDispatcher.disableHotWire();
+                    bluetoothBroker.clearInputBuffer();
+                } catch (CannotUnpackByteArrayException ex) {
+                    Logger.getLogger(BluetoothUtils.class.getName()).log(Level.SEVERE, null, ex);
+                    fatalErrorOccured();
                 }
-            }));
-        } catch (IOException | IllegalAccessException | PackingNotImplementedException ex) {
+            }
+
+            @Override
+            public void onResponseTimeout() {
+                fatalErrorOccured();
+            }
+        };
+        messageDispatcher.setHotwiredDataStream(hotwiredDataStreamAdapter);
+
+        try {
+            bluetoothBroker.send(messageFactory.createReflectiveInstance(ClearOutputBufferCommand.class));
+        } catch (IllegalAccessException | PackingNotImplementedException | IOException ex) {
             Logger.getLogger(BluetoothUtils.class.getName()).log(Level.SEVERE, null, ex);
-            fatalErrorOccured();
         }
     }
 

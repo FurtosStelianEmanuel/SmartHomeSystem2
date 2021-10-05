@@ -20,7 +20,6 @@ import messaging.bluetooth.threading.BluetoothInputWorker;
 import messaging.bluetooth.threading.BluetoothOutputWorker;
 import messaging.bluetooth.threading.factories.BluetoothInputWorkerFactory;
 import messaging.bluetooth.threading.factories.BluetoothOutputWorkerFactory;
-import messaging.exceptions.PackingNotImplementedException;
 
 /**
  *
@@ -54,7 +53,7 @@ public class BluetoothBroker extends MessageBroker<BluetoothConfig, EncodingAlgo
     }
 
     @Override
-    public void initConnection(BluetoothConfig config) throws IOException, IllegalArgumentException, IllegalAccessException, PackingNotImplementedException {
+    public void initConnection(BluetoothConfig config) throws IOException {
         super.initConnection(config);
         bluetoothWrapper.connectToModule(config);
 
@@ -83,14 +82,15 @@ public class BluetoothBroker extends MessageBroker<BluetoothConfig, EncodingAlgo
         threadPoolSupervisor.startThread(outputWorker);
         threadPoolSupervisor.startThread(inputWorker);
         threadPoolSupervisor.startThread(messageDispatcherWorker);
-
-        bluetoothUtils.setup(messageFactory, this, inputWorker, messageDispatcher);
-        bluetoothUtils.clearArduinoCommunication();
     }
 
     @Override
     public void closeConnection() throws IOException {
         bluetoothWrapper.disconnect();
         super.closeConnection();
+    }
+
+    void clearInputBuffer() {
+        inputWorker.clearInputBuffer();
     }
 }

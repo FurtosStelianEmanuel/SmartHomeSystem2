@@ -8,7 +8,9 @@ package smarthomesystem.commandhandlers;
 import messaging.CommandHandler;
 import messaging.MessageBroker;
 import messaging.MessageFactory;
+import messaging.events.EventDispatcher;
 import smarthomesystem.commands.DoorOpenedCommand;
+import smarthomesystem.events.models.DoorOpened;
 
 /**
  *
@@ -18,14 +20,16 @@ public class ArduinoPeripheralsCommandHandler extends CommandHandler implements 
 
     private final MessageBroker broker;
     private final MessageFactory messageFactory;
+    private final EventDispatcher eventDispatcher;
 
-    public ArduinoPeripheralsCommandHandler(MessageBroker broker, MessageFactory messageFactory) {
+    public ArduinoPeripheralsCommandHandler(MessageBroker broker, MessageFactory messageFactory, EventDispatcher eventDispatcher) {
         this.broker = broker;
         this.messageFactory = messageFactory;
+        this.eventDispatcher = eventDispatcher;
     }
 
     @Override
     public void handle(DoorOpenedCommand command) {
-        System.out.println("fac handle la ceva");
+        eventDispatcher.dispatchEvent(new DoorOpened());
     }
 }

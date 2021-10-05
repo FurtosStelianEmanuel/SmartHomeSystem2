@@ -19,6 +19,8 @@ public class ClearOutputBufferCommandResponse extends Response {
     byte[] confirmationBytes;
     byte endByte;
 
+    private boolean hasBadBytes = false;
+
     public ClearOutputBufferCommandResponse(byte[] rawData) throws CannotUnpackByteArrayException {
         super((byte) -127);
         confirmationBytes = new byte[Misc.CLEAR_BUFFER_NR_CONFIRMATION_BYTES];
@@ -28,6 +30,7 @@ public class ClearOutputBufferCommandResponse extends Response {
         if (rawData.length >= Misc.CLEAR_BUFFER_NR_CONFIRMATION_BYTES + 2) {
             for (int i = 0; i < rawData.length; i++) {
                 if (rawData[i] == identifier) {
+                    hasBadBytes = i != 0;
                     startByte = rawData[i];
                     if (i < rawData.length - 1) {
                         i++;
@@ -50,5 +53,9 @@ public class ClearOutputBufferCommandResponse extends Response {
             }
         }
         throw new CannotUnpackByteArrayException();
+    }
+
+    public boolean hasBadBytes() {
+        return hasBadBytes;
     }
 }

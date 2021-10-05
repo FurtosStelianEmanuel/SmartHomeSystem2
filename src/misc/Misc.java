@@ -12,5 +12,4 @@ package misc;
 public class Misc {
 
     public static final int CLEAR_BUFFER_NR_CONFIRMATION_BYTES = 10;
-    public static boolean LOGGING_GUARD_OUTPUT_BUFFER_CLEARED = true;
 }

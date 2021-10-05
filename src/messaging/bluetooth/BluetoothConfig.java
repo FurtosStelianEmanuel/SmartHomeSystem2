@@ -14,12 +14,21 @@ import messaging.BrokerConfig;
 public class BluetoothConfig extends BrokerConfig {
 
     private String address;
-
+    private String name;
+    
     public void setAddress(String address) {
         this.address = address;
     }
 
     public String getAddress() {
         return address;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }

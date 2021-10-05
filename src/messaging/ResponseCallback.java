@@ -18,7 +18,7 @@ public abstract class ResponseCallback<T extends Response> {
         this.type = type;
     }
 
-    public abstract void onResponse(T commandResponse);
+    public abstract void onResponse(T response);
 
     public Class getType() {
         return type;

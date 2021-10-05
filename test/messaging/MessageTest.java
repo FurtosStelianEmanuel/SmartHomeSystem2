@@ -44,7 +44,7 @@ public class MessageTest extends TestUtils {
             assertEquals(69, result[3]);
             assertEquals(13, result[4]);
             assertEquals(17, result[5]);
-        } catch (IllegalArgumentException | IllegalAccessException | PackingNotImplementedException ex) {
+        } catch (PackingNotImplementedException ex) {
             fail(unexpectedError(ex));
         }
     }
@@ -65,8 +65,8 @@ public class MessageTest extends TestUtils {
         try {
             message.pack();
             fail(expectedErrorShouldHaveOccured(PackingNotImplementedException.class));
-        } catch (IllegalArgumentException | IllegalAccessException | PackingNotImplementedException ex) {
-            
+        } catch (PackingNotImplementedException ex) {
+
         }
     }
 
@@ -108,7 +108,7 @@ public class MessageTest extends TestUtils {
             byte[] result = message.pack();
             byte[] expectedResult = new byte[]{(byte) 100, (byte) 15};
             assertArrayEquals(expectedResult, result);
-        } catch (IllegalArgumentException | IllegalAccessException | PackingNotImplementedException ex) {
+        } catch (PackingNotImplementedException ex) {
             fail(unexpectedError(ex));
         }
     }

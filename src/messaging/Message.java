@@ -8,6 +8,8 @@ package messaging;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import messaging.exceptions.PackingNotImplementedException;
 
 /**
@@ -25,35 +27,25 @@ public abstract class Message {
         serialisedData = new ArrayList<>();
     }
 
-    public byte[] pack() throws IllegalArgumentException, IllegalAccessException, PackingNotImplementedException {
+    public byte[] pack() throws PackingNotImplementedException {
         Field[] fields = getClass().getFields();
         serialisedData.clear();
-
-        int customFieldIndex;
-        byte[] byteArrayToSerialize;
 
         for (Field field : fields) {
             switch (field.getType().getTypeName()) {
                 case "byte":
                     if (!"identifier".equals(field.getName())) {
-                        serialisedData.add(field.getByte(this));
+                        parseByte(field);
                     }
                     break;
                 case "byte[]":
-                    byteArrayToSerialize = (byte[]) field.get(this);
-                    for (customFieldIndex = 0; customFieldIndex < byteArrayToSerialize.length; customFieldIndex++) {
-                        serialisedData.add(byteArrayToSerialize[customFieldIndex]);
-                    }
+                    parseByteArray(field);
                     break;
                 case "boolean":
-                    serialisedData.add(field.getBoolean(this) ? (byte) 1 : (byte) 0);
+                    parseBoolean(field);
                     break;
                 case "int":
-                    if (field.getInt(this) > 255 || field.getInt(this) < 0) {
-                        checkForCustomImplementation(field);
-                    } else {
-                        serialisedData.add((byte) field.getInt(this));
-                    }
+                    parseInt(field);
                     break;
                 default:
                     checkForCustomImplementation(field);
@@ -69,9 +61,64 @@ public abstract class Message {
         return packedData;
     }
 
-    private void checkForCustomImplementation(Field field) throws PackingNotImplementedException, IllegalArgumentException, IllegalAccessException {
+    private void parseByte(Field field) {
+        try {
+            byte value = field.getByte(this);
+            serialisedData.add(value);
+        } catch (IllegalArgumentException | IllegalAccessException ex) {
+            Logger.getLogger(Message.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    private void parseByteArray(Field field) {
+        byte[] byteArrayToSerialize = new byte[0];
+
+        try {
+            byteArrayToSerialize = (byte[]) field.get(this);
+        } catch (IllegalArgumentException | IllegalAccessException ex) {
+            Logger.getLogger(Message.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        for (int i = 0; i < byteArrayToSerialize.length; i++) {
+            serialisedData.add(byteArrayToSerialize[i]);
+        }
+    }
+
+    private void parseBoolean(Field field) {
+        try {
+            serialisedData.add(field.getBoolean(this) ? (byte) 1 : (byte) 0);
+        } catch (IllegalArgumentException | IllegalAccessException ex) {
+            Logger.getLogger(Message.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    private void parseInt(Field field) throws PackingNotImplementedException {
+        int value = 0;
+
+        try {
+            value = field.getInt(this);
+        } catch (IllegalArgumentException | IllegalAccessException ex) {
+            Logger.getLogger(Message.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        if (value > 255 || value < 0) {
+            checkForCustomImplementation(field);
+        } else {
+            serialisedData.add((byte) value);
+        }
+    }
+
+    private void checkForCustomImplementation(Field field) throws PackingNotImplementedException {
         byte[] serialisedCustomFields;
-        serialisedCustomFields = packCustomFields(field.getName(), field.get(this));
+        Object value = null;
+
+        try {
+            value = field.get(this);
+        } catch (IllegalArgumentException | IllegalAccessException ex) {
+            Logger.getLogger(Message.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        serialisedCustomFields = packCustomFields(field.getName(), value);
         if (serialisedCustomFields == UNIMPLEMENTED_CUSTOM_FIELD_PACKER) {
             throw new PackingNotImplementedException(field.getType().getTypeName(), field.getName());
         }

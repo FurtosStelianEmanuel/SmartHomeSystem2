@@ -3,14 +3,48 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/Users/Manel/Documents/NetBeansProjects/SmartHomeSystem2/src/messaging/MessageUtils.java</file>
-            <file>file:/C:/Users/Manel/Documents/NetBeansProjects/SmartHomeSystem2/src/messaging/MessageDispatcher.java</file>
-            <file>file:/C:/Users/Manel/Documents/NetBeansProjects/SmartHomeSystem2/src/smarthomesystem/commandhandlers/ArduinoPeripheralsCommandHandler.java</file>
+            <file>file:/C:/Users/Manel/Documents/NetBeansProjects/SmartHomeSystem2/src/messaging/bluetooth/BluetoothBroker.java</file>
+            <file>file:/C:/Users/Manel/Documents/NetBeansProjects/SmartHomeSystem2/src/smarthomesystem/events/handlers/ConnectionEventHandler.java</file>
+            <file>file:/C:/Users/Manel/Documents/NetBeansProjects/SmartHomeSystem2/src/messaging/ConnectionService.java</file>
+            <file>file:/C:/Users/Manel/Documents/NetBeansProjects/SmartHomeSystem2/src/smarthomesystem/ui/frames/connection/ConnectionFrame.java</file>
+            <file>file:/C:/Users/Manel/Documents/NetBeansProjects/SmartHomeSystem2/src/messaging/events/threading/EventDispatcherWorker.java</file>
+            <file>file:/C:/Users/Manel/Documents/NetBeansProjects/SmartHomeSystem2/src/messaging/bluetooth/BluetoothConfig.java</file>
             <file>file:/C:/Users/Manel/Documents/NetBeansProjects/SmartHomeSystem2/src/messaging/MessageIdentifierGenerator.java</file>
-            <file>file:/C:/Users/Manel/Documents/NetBeansProjects/SmartHomeSystem2/src/messaging/commands/responses/TurnOffBuiltInLedCommandResponse.java</file>
+            <file>file:/C:/Users/Manel/Documents/NetBeansProjects/SmartHomeSystem2/src/smarthomesystem/ui/services/connection/BluetoothConnectionFrameService.java</file>
             <file>file:/C:/Users/Manel/Documents/NetBeansProjects/SmartHomeSystem2/src/messaging/bluetooth/threading/BluetoothInputWorker.java</file>
+            <file>file:/C:/Users/Manel/Documents/NetBeansProjects/SmartHomeSystem2/src/threading/ThreadPoolSupervisor.java</file>
+            <file>file:/C:/Users/Manel/Documents/NetBeansProjects/SmartHomeSystem2/src/data/PathProvider.java</file>
+            <file>file:/C:/Users/Manel/Documents/NetBeansProjects/SmartHomeSystem2/src/messaging/MessageDispatcherWorker.java</file>
+            <file>file:/C:/Users/Manel/Documents/NetBeansProjects/SmartHomeSystem2/src/smarthomesystem/ui/ColorPallete.java</file>
+            <file>file:/C:/Users/Manel/Documents/NetBeansProjects/SmartHomeSystem2/src/messaging/HotwiredDataStream.java</file>
+            <file>file:/C:/Users/Manel/Documents/NetBeansProjects/SmartHomeSystem2/src/messaging/ConnectionListener.java</file>
+            <file>file:/C:/Users/Manel/Documents/NetBeansProjects/SmartHomeSystem2/src/messaging/commands/responses/ClearOutputBufferCommandResponse.java</file>
+            <file>file:/C:/Users/Manel/Documents/NetBeansProjects/SmartHomeSystem2/src/messaging/HotwiredDataStreamAdapter.java</file>
+            <file>file:/C:/Users/Manel/Documents/NetBeansProjects/SmartHomeSystem2/src/data/SerializationUtils.java</file>
+            <file>file:/C:/Users/Manel/Documents/NetBeansProjects/SmartHomeSystem2/src/smarthomesystem/events/handlers/ArduinoPeripheralsEventHandler.java</file>
             <file>file:/C:/Users/Manel/Documents/NetBeansProjects/SmartHomeSystem2/src/smarthomesystem/SmartHomeSystem.java</file>
-            <file>file:/C:/Users/Manel/Documents/NetBeansProjects/SmartHomeSystem2/src/smarthomesystem/commands/DoorOpenedCommand.java</file>
+            <file>file:/C:/Users/Manel/Documents/NetBeansProjects/SmartHomeSystem2/src/smarthomesystem/ui/frames/connection/BluetoothConnectingFrame.java</file>
+            <file>file:/C:/Users/Manel/Documents/NetBeansProjects/SmartHomeSystem2/src/messaging/bluetooth/BluetoothUtils.java</file>
+            <file>file:/C:/Users/Manel/Documents/NetBeansProjects/SmartHomeSystem2/src/smarthomesystem/ui/services/connection/ConnectionFrameService.java</file>
+            <file>file:/C:/Users/Manel/Documents/NetBeansProjects/SmartHomeSystem2/src/messaging/MessageUtils.java</file>
+            <file>file:/C:/Users/Manel/Documents/NetBeansProjects/SmartHomeSystem2/src/messaging/bluetooth/threading/factories/BluetoothInputWorkerFactory.java</file>
+            <file>file:/C:/Users/Manel/Documents/NetBeansProjects/SmartHomeSystem2/src/smarthomesystem/animation/AnimationListener.java</file>
+            <file>file:/C:/Users/Manel/Documents/NetBeansProjects/SmartHomeSystem2/src/smarthomesystem/ui/services/main/IndexFrameService.java</file>
+            <file>file:/C:/Users/Manel/Documents/NetBeansProjects/SmartHomeSystem2/src/messaging/MessageBroker.java</file>
+            <file>file:/C:/Users/Manel/Documents/NetBeansProjects/SmartHomeSystem2/src/messaging/Message.java</file>
+            <file>file:/C:/Users/Manel/Documents/NetBeansProjects/SmartHomeSystem2/src/smarthomesystem/queries/results/AnalogValueQueryResult.java</file>
+            <file>file:/C:/Users/Manel/Documents/NetBeansProjects/SmartHomeSystem2/src/messaging/ResponseCallback.java</file>
+            <file>file:/C:/Users/Manel/Documents/NetBeansProjects/SmartHomeSystem2/src/messaging/events/models/BluetoothConnectionEstablished.java</file>
+            <file>file:/C:/Users/Manel/Documents/NetBeansProjects/SmartHomeSystem2/src/messaging/ResponseListener.java</file>
+            <file>file:/C:/Users/Manel/Documents/NetBeansProjects/SmartHomeSystem2/src/smarthomesystem/ui/frames/main/IndexFrame.java</file>
+            <file>file:/C:/Users/Manel/Documents/NetBeansProjects/SmartHomeSystem2/src/smarthomesystem/ui/services/connection/BluetoothConnectingFrameService.java</file>
+            <file>file:/C:/Users/Manel/Documents/NetBeansProjects/SmartHomeSystem2/src/messaging/MessageDispatcher.java</file>
+            <file>file:/C:/Users/Manel/Documents/NetBeansProjects/SmartHomeSystem2/src/smarthomesystem/ui/frames/connection/BluetoothConnectionFrame.java</file>
+            <file>file:/C:/Users/Manel/Documents/NetBeansProjects/SmartHomeSystem2/src/smarthomesystem/commands/ModulatePulseWidthCommand.java</file>
+            <file>file:/C:/Users/Manel/Documents/NetBeansProjects/SmartHomeSystem2/src/messaging/commands/responses/GenericCommandResponse.java</file>
+            <file>file:/C:/Users/Manel/Documents/NetBeansProjects/SmartHomeSystem2/src/smarthomesystem/queries/AnalogValueQuery.java</file>
+            <file>file:/C:/Users/Manel/Documents/NetBeansProjects/SmartHomeSystem2/src/messaging/MessageFactory.java</file>
+            <file>file:/C:/Users/Manel/Documents/NetBeansProjects/SmartHomeSystem2/src/misc/Misc.java</file>
         </group>
     </open-files>
 </project-private>

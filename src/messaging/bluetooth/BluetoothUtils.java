@@ -11,15 +11,13 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import messaging.MessageDispatcher;
 import messaging.MessageFactory;
-import messaging.ResponseCallback;
-import messaging.ResponseListener;
-import messaging.TimeoutProtocol;
-import messaging.bluetooth.threading.BluetoothInputWorker;
 import messaging.commands.ClearOutputBufferCommand;
 import messaging.commands.responses.ClearOutputBufferCommandResponse;
-import messaging.exceptions.BufferNotClearedException;
 import messaging.exceptions.PackingNotImplementedException;
-import misc.Misc;
+import messaging.HotwiredDataStreamAdapter;
+import messaging.exceptions.CannotUnpackByteArrayException;
+import smarthomesystem.SmartHomeSystem;
+import static smarthomesystem.SmartHomeSystem.container;
 
 /**
  *
@@ -28,61 +26,48 @@ import misc.Misc;
 @Injectable
 public class BluetoothUtils {
 
-    private MessageFactory messageFactory;
-    private BluetoothBroker bluetoothBroker;
-    private BluetoothInputWorker inputWorker;
-    private MessageDispatcher messageDispatcher;
+    private final MessageFactory messageFactory;
+    private final MessageDispatcher messageDispatcher;
 
-    public void setup(
-            MessageFactory messageFactory,
-            BluetoothBroker bluetoothBroker,
-            BluetoothInputWorker inputWorker,
-            MessageDispatcher messageDispatcher
-    ) {
-        this.messageDispatcher = messageDispatcher;
+    private BluetoothBroker bluetoothBroker;
+
+    public BluetoothUtils(MessageFactory messageFactory, MessageDispatcher messageDispatcher) {
         this.messageFactory = messageFactory;
-        this.bluetoothBroker = bluetoothBroker;
-        this.inputWorker = inputWorker;
+        this.messageDispatcher = messageDispatcher;
     }
 
     public void clearArduinoCommunication() {
-        try {
-            Misc.LOGGING_GUARD_OUTPUT_BUFFER_CLEARED = false;
-            bluetoothBroker.send(messageFactory.createReflectiveInstance(ClearOutputBufferCommand.class), new ResponseListener(
-                    false,
-                    new ResponseCallback<ClearOutputBufferCommandResponse>(ClearOutputBufferCommandResponse.class) {
-                @Override
-                public void onResponse(ClearOutputBufferCommandResponse commandResponse) {
-                    inputWorker.clearInputBuffer();
-                    messageDispatcher.setPartialMessagesEnabled(false);
-                    Misc.LOGGING_GUARD_OUTPUT_BUFFER_CLEARED = true;
-                }
-            }, new TimeoutProtocol(10000) {
-                @Override
-                public void onTimeout() {
-                    if (!Misc.LOGGING_GUARD_OUTPUT_BUFFER_CLEARED) {
-                        try {
-                            throw new BufferNotClearedException();
-                        } catch (BufferNotClearedException ex) {
-                            Logger.getLogger(BluetoothBroker.class.getName()).log(Level.SEVERE, null, ex);
-                        }
-                        fatalErrorOccured();
-                    }
-                }
-            }));
-        } catch (IOException | IllegalAccessException | PackingNotImplementedException ex) {
-            Logger.getLogger(BluetoothUtils.class.getName()).log(Level.SEVERE, null, ex);
-            fatalErrorOccured();
-        }
-    }
+        bluetoothBroker = container.resolveDependencies(BluetoothBroker.class);
 
-    private void fatalErrorOccured() {
+        messageDispatcher.setHotwiredDataStream(new HotwiredDataStreamAdapter(10000) {
+            @Override
+            public void onHotwiredResponse(byte[] data) {
+                try {
+                    ClearOutputBufferCommandResponse clearOutputBufferCommandResponse = new ClearOutputBufferCommandResponse(data);
+
+                    messageDispatcher.disableHotWire();
+
+                    if (clearOutputBufferCommandResponse.hasBadBytes()) {
+                        bluetoothBroker.clearInputBuffer();
+                        Logger.getLogger(BluetoothUtils.class.getName()).log(Level.INFO, String.format("Bluetooth buffer has been cleared"));
+                    }
+                } catch (CannotUnpackByteArrayException ex) {
+                    Logger.getLogger(BluetoothUtils.class.getName()).log(Level.SEVERE, null, ex);
+                    container.resolveDependencies(smarthomesystem.SmartHomeSystem.class).terminateSmartHomeSystem();
+                }
+            }
+
+            @Override
+            public void onResponseTimeout() {
+                container.resolveDependencies(SmartHomeSystem.class).terminateSmartHomeSystem();
+            }
+        });
+
         try {
-            bluetoothBroker.closeConnection();
-            Thread.sleep(1000);
-        } catch (IOException | InterruptedException ex1) {
-            Logger.getLogger(BluetoothUtils.class.getName()).log(Level.SEVERE, null, ex1);
+            bluetoothBroker.send(messageFactory.createReflectiveInstance(ClearOutputBufferCommand.class));
+        } catch (IOException | PackingNotImplementedException ex) {
+            Logger.getLogger(BluetoothUtils.class.getName()).log(Level.SEVERE, null, ex);
+            container.resolveDependencies(SmartHomeSystem.class).terminateSmartHomeSystem();
         }
-        System.exit(0);
     }
 }

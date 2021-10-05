@@ -24,37 +24,23 @@ public class ConnectionService {
     ConnectionListener connectionListener;
     RetryConnectionPolicy retryPolicy;
 
-    public void connectTo(final BrokerConfig config, Class<? extends MessageBroker> brokerType) throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, UnresolvableDependency {
-        if (connectionListener == null) {
-            throw new IllegalAccessException();
-        }
-
+    public void connectTo(final BrokerConfig config, Class<? extends MessageBroker> brokerType) {
         if (retryPolicy == null) {
             retryPolicy = new RetryConnectionPolicy(0);
         }
 
-        MessageBroker messageBroker = container.resolveDependencies(brokerType);
         new Thread() {
             @Override
             public void run() {
-                try {
-                    connectionListener.onInit();
-                    messageBroker.initConnection(config);
-                    connectionListener.onSuccess();
-                } catch (IOException | IllegalArgumentException | IllegalAccessException | PackingNotImplementedException ex) {
-                    while (retryPolicy.hasAvailableRetries()) {
-                        try {
-                            connectionListener.onRetry();
-                            messageBroker.initConnection(config);
-                            connectionListener.onSuccess();
-                            return;
-                        } catch (IOException | IllegalArgumentException | IllegalAccessException | PackingNotImplementedException ex1) {
-                            Logger.getLogger(ConnectionService.class.getName()).log(Level.SEVERE, null, ex);
-                            retryPolicy.connectionAttemptFailed();
-                        }
-                    }
+                connectionListener.onInit();
+
+                while (!tryToConnect(config, brokerType) && retryPolicy.hasAvailableRetries()) {
+                    connectionListener.onRetry();
+                    retryPolicy.consumeRetryAttempt();
+                }
+
+                if (!retryPolicy.hasAvailableRetries()) {
                     connectionListener.onFailure();
-                    Logger.getLogger(ConnectionService.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
         }.start();
@@ -76,4 +62,16 @@ public class ConnectionService {
         return retryPolicy;
     }
 
+    private boolean tryToConnect(BrokerConfig config, Class<? extends MessageBroker> brokerType) {
+        MessageBroker messageBroker = container.resolveDependencies(brokerType);
+
+        try {
+            messageBroker.initConnection(config);
+            connectionListener.onSuccess();
+            return true;
+        } catch (IOException ex) {
+            Logger.getLogger(ConnectionService.class.getName()).log(Level.SEVERE, null, ex);
+            return false;
+        }
+    }
 }

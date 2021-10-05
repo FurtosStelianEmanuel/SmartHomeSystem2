@@ -54,7 +54,7 @@ public class BluetoothBroker extends MessageBroker<BluetoothConfig, EncodingAlgo
     }
 
     @Override
-    public void initConnection(BluetoothConfig config) throws IOException, IllegalArgumentException, IllegalAccessException, PackingNotImplementedException {
+    public void initConnection(BluetoothConfig config) throws IOException {
         super.initConnection(config);
         bluetoothWrapper.connectToModule(config);
 

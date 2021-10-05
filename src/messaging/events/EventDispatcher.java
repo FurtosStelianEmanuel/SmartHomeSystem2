@@ -38,13 +38,12 @@ public class EventDispatcher {
         this.eventDispatcherWorker = eventDispatcherWorker;
     }
 
-    public void init() throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException, UnresolvableDependency {
+    public void init() {
         Set<Class<? extends EventHandler>> eventHandlers = reflections.getSubTypesOf(EventHandler.class);
         Iterator<Class<? extends EventHandler>> iterator = eventHandlers.iterator();
 
         while (iterator.hasNext()) {
             EventHandler eventHandlerInstance = container.resolveDependencies(iterator.next());
-            List<Pair<Object, Method>> handlers = new ArrayList<>();
 
             for (Method method : eventHandlerInstance.getClass().getDeclaredMethods()) {
                 if (Modifier.isPublic(method.getModifiers())) {

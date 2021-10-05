@@ -23,7 +23,7 @@ public class RetryConnectionPolicy {
         return retryCount > 0;
     }
 
-    public void connectionAttemptFailed() {
+    public void consumeRetryAttempt() {
         retryCount--;
     }
 

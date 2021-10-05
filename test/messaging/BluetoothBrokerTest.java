@@ -93,7 +93,7 @@ public class BluetoothBrokerTest extends TestUtils {
             when(bluetoothModuleApiWrapperMock.getOutputStream()).thenReturn(outputStreamMock);
             bluetoothBroker.initConnection(config);
 
-        } catch (IOException | IllegalArgumentException | IllegalAccessException | PackingNotImplementedException ex) {
+        } catch (IOException | IllegalArgumentException ex) {
             fail(unexpectedError(ex));
         } finally {
             assertEquals(macAddress, bluetoothBroker.config.getAddress());
@@ -182,7 +182,7 @@ public class BluetoothBrokerTest extends TestUtils {
 
         try {
             bluetoothBroker.send(messageMock, responseListenerMock);
-        } catch (IOException | IllegalAccessException | PackingNotImplementedException ex) {
+        } catch (IOException | PackingNotImplementedException ex) {
             fail(unexpectedError(ex));
         } finally {
             verify(messageMock).pack();
@@ -207,7 +207,7 @@ public class BluetoothBrokerTest extends TestUtils {
 
         try {
             bluetoothBroker.send(messageMock, responseListenerMock);
-        } catch (IOException | IllegalAccessException | PackingNotImplementedException ex) {
+        } catch (IOException | PackingNotImplementedException ex) {
             fail(unexpectedError(ex));
         } finally {
             verify(messageMock).pack();

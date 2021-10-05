@@ -86,7 +86,7 @@ public class IndexFrame extends ServiceableFrame<IndexFrameService> {
     private void jSlider1StateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jSlider1StateChanged
         try {
             service.sendColor();
-        } catch (IOException | IllegalAccessException | PackingNotImplementedException | NoSuchMethodException | InvocationTargetException | InstantiationException | UnresolvableDependency ex) {
+        } catch (IOException | PackingNotImplementedException ex) {
             Logger.getLogger(IndexFrame.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_jSlider1StateChanged
@@ -94,11 +94,11 @@ public class IndexFrame extends ServiceableFrame<IndexFrameService> {
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         try {
             service.getLightAmount();
-        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | InstantiationException | UnresolvableDependency | PackingNotImplementedException | IOException ex) {
+        } catch (IOException | PackingNotImplementedException ex) {
             Logger.getLogger(IndexFrame.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_jButton1ActionPerformed
-    
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
     public javax.swing.JSlider jSlider1;

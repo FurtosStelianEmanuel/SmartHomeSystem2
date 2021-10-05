@@ -86,7 +86,7 @@ public class MessageDispatcher {
 
     private void regularDispatch() {
         try {
-            callHandlers();
+            callHandler();
             callResponseListeners();
         } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
             Logger.getLogger(MessageDispatcher.class.getName()).log(Level.SEVERE, null, ex);
@@ -98,7 +98,7 @@ public class MessageDispatcher {
         listeners.add(responseListener);
     }
 
-    public void initHandlers() throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, UnresolvableDependency, HandlersAlreadyInitializedException {
+    public void initHandlers() throws HandlersAlreadyInitializedException {
         if (!commandHandlers.isEmpty()) {
             throw new HandlersAlreadyInitializedException();
         }
@@ -129,7 +129,7 @@ public class MessageDispatcher {
         cleanupListeners();
     }
 
-    private void callHandlers() throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+    private void callHandler() throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
         Message unpacked = messageUtils.unpack(messageToDispatch);
         if (unpacked == null) {
             return;

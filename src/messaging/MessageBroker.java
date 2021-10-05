@@ -60,7 +60,7 @@ public abstract class MessageBroker<
         this.messageUtils = messageUtils;
     }
 
-    public void initConnection(T config) throws IOException, IllegalArgumentException, IllegalAccessException, PackingNotImplementedException {
+    public void initConnection(T config) throws IOException {
         this.config = config;
     }
 
@@ -82,14 +82,14 @@ public abstract class MessageBroker<
     }
 
     @Override
-    public void send(Message message, ResponseListener responseListener) throws IOException, IllegalAccessException, PackingNotImplementedException {
+    public void send(Message message, ResponseListener responseListener) throws IOException, PackingNotImplementedException {
         DataSender sender = (DataSender) outputWorker;
         handleNewListener(responseListener);
         sender.send(message.pack());
     }
 
     @Override
-    public void send(Message message) throws IllegalAccessException, PackingNotImplementedException, IOException {
+    public void send(Message message) throws IOException, PackingNotImplementedException {
         DataSender sender = (DataSender) outputWorker;
         sender.send(message.pack());
     }

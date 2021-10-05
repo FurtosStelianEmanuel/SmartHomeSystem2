@@ -21,7 +21,7 @@ import smarthomesystem.ui.frames.connection.BluetoothConnectionFrame;
 @Injectable
 public class ConnectionFrameService extends FrameService<ConnectionFrame> {
 
-    public void bluetoothConnectionDesired(ActionEvent evt) throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, UnresolvableDependency {
+    public void bluetoothConnectionDesired(ActionEvent evt) {
         BluetoothConnectionFrame bluetoothConnectionFrame = container.resolveDependencies(BluetoothConnectionFrame.class);
         bluetoothConnectionFrame.setLocationRelativeTo(null);
         bluetoothConnectionFrame.setVisible(true);

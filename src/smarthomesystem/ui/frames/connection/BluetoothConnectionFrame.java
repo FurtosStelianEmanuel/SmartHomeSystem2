@@ -99,11 +99,7 @@ public class BluetoothConnectionFrame extends ServiceableFrame<BluetoothConnecti
     }
 
     private void showPreviousFrame() {
-        try {
-            container.resolveDependencies(ConnectionFrame.class).setVisible(true);
-        } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException | UnresolvableDependency ex) {
-            Logger.getLogger(BluetoothConnectionFrame.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        container.resolveDependencies(ConnectionFrame.class).setVisible(true);
     }
 
     private void handleRowSelected() {
@@ -278,13 +274,9 @@ public class BluetoothConnectionFrame extends ServiceableFrame<BluetoothConnecti
         saveDevices();
         setVisible(false);
 
-        try {
-            BluetoothConnectingFrameService connectingFrameService = container.resolveDependencies(BluetoothConnectingFrameService.class);
-            int selectedRow = jTable1.getSelectedRow();
-            connectingFrameService.tryToConnect(new Pair(jTable1.getValueAt(selectedRow, 0), jTable1.getValueAt(selectedRow, 1)));
-        } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException | UnresolvableDependency ex) {
-            Logger.getLogger(BluetoothConnectionFrame.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        BluetoothConnectingFrameService connectingFrameService = container.resolveDependencies(BluetoothConnectingFrameService.class);
+        int selectedRow = jTable1.getSelectedRow();
+        connectingFrameService.tryToConnect(new Pair(jTable1.getValueAt(selectedRow, 0), jTable1.getValueAt(selectedRow, 1)));
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed

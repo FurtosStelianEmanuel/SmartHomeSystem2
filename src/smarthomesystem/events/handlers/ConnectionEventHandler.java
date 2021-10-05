@@ -28,7 +28,7 @@ public class ConnectionEventHandler extends EventHandler {
         this.bluetoothUtils = bluetoothUtils;
     }
 
-    public void handle(BluetoothConnectionEstablished event) throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, UnresolvableDependency, ThreadNotFoundException, ThreadAlreadyStartedException {
+    public void handle(BluetoothConnectionEstablished event) throws ThreadNotFoundException, ThreadAlreadyStartedException {
         container.resolveDependencies(IndexFrame.class).setVisible(true);
         container.resolveDependencies(BluetoothBroker.class).startBackgroundWorkers();
         bluetoothUtils.clearArduinoCommunication();

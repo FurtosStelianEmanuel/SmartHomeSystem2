@@ -5,6 +5,7 @@
  */
 package smarthomesystem;
 
+import annotations.Injectable;
 import banana.Injector;
 import banana.InjectorInterface;
 import banana.exceptions.ClassNotInjectable;
@@ -66,23 +67,24 @@ public class SmartHomeSystem {
 
     public static InjectorInterface container;
 
-    public void initSmartHomeSystem() throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, UnresolvableDependency, HandlersAlreadyInitializedException {
+    public void initSmartHomeSystem() throws HandlersAlreadyInitializedException {
         initDependencyInjection();
         initHandlers();
         initDispatchers();
         mergeFormsAndFormServices();
     }
 
-    public void terminateSmartHomeSystem() throws InterruptedException {
+    public void terminateSmartHomeSystem() {
+        ThreadPoolSupervisor threadPoolSupervisor = container.resolveDependencies(ThreadPoolSupervisor.class);
+        threadPoolSupervisor.terminateAllThreads();
+
         try {
-            ThreadPoolSupervisor threadPoolSupervisor = container.resolveDependencies(ThreadPoolSupervisor.class);
-            threadPoolSupervisor.terminateAllThreads();
             Thread.sleep(1000);
-        } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException | UnresolvableDependency ex) {
+        } catch (InterruptedException ex) {
             Logger.getLogger(SmartHomeSystem.class.getName()).log(Level.SEVERE, null, ex);
-        } finally {
-            System.exit(0);
         }
+
+        System.exit(0);
     }
 
     private void initDependencyInjection() {
@@ -138,12 +140,12 @@ public class SmartHomeSystem {
         }
     }
 
-    private void initHandlers() throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, UnresolvableDependency, HandlersAlreadyInitializedException {
+    private void initHandlers() throws HandlersAlreadyInitializedException {
         container.resolveDependencies(MessageDispatcher.class).initHandlers();
         container.resolveDependencies(EventDispatcher.class).init();
     }
 
-    private void initDispatchers() throws InstantiationException, IllegalAccessException, InvocationTargetException, UnresolvableDependency, NoSuchMethodException {
+    private void initDispatchers() {
         ThreadPoolSupervisor threadPoolSupervisor = container.resolveDependencies(ThreadPoolSupervisor.class);
         EventDispatcher eventDispatcher = container.resolveDependencies(EventDispatcher.class);
         EventDispatcherWorker eventDispatcherWorker = container.resolveDependencies(EventDispatcherWorker.class);
@@ -158,7 +160,7 @@ public class SmartHomeSystem {
         }
     }
 
-    private void mergeFormsAndFormServices() throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, UnresolvableDependency {
+    private void mergeFormsAndFormServices() {
         Reflections reflections = container.resolveDependencies(Reflections.class);
         Set<Class<? extends FrameService>> frameServices = reflections.getSubTypesOf(FrameService.class);
         Iterator iterator = frameServices.iterator();
@@ -172,14 +174,14 @@ public class SmartHomeSystem {
         }
     }
 
-    private void openConnectionFrame() throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, UnresolvableDependency {
+    private void openConnectionFrame() {
         ConnectionFrame connectionFrame = container.resolveDependencies(ConnectionFrame.class);
 
         connectionFrame.setLocationRelativeTo(null);
         connectionFrame.setVisible(true);
     }
 
-    public static void main(String[] args) throws IOException, ThreadNotFoundException, ThreadAlreadyStartedException, IllegalArgumentException, IllegalAccessException, PackingNotImplementedException, InterfaceNotImplemented, ClassNotInjectable, NoSuchMethodException, NoSuchMethodException, NoSuchMethodException, InstantiationException, InvocationTargetException, UnresolvableDependency, ClassNotInjectable, HandlersAlreadyInitializedException {
+    public static void main(String[] args) throws HandlersAlreadyInitializedException {
         SmartHomeSystem smartHomeSystem = new SmartHomeSystem();
         smartHomeSystem.initSmartHomeSystem();
 

@@ -18,6 +18,7 @@ import messaging.commands.responses.ClearOutputBufferCommandResponse;
 import messaging.exceptions.PackingNotImplementedException;
 import messaging.HotwiredDataStreamAdapter;
 import messaging.exceptions.CannotUnpackByteArrayException;
+import smarthomesystem.SmartHomeSystem;
 import static smarthomesystem.SmartHomeSystem.container;
 
 /**
@@ -38,50 +39,37 @@ public class BluetoothUtils {
     }
 
     public void clearArduinoCommunication() {
-        try {
-            bluetoothBroker = container.resolveDependencies(BluetoothBroker.class);
-        } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException | UnresolvableDependency ex) {
-            Logger.getLogger(BluetoothUtils.class.getName()).log(Level.SEVERE, null, ex);
-            return;
-        }
+        bluetoothBroker = container.resolveDependencies(BluetoothBroker.class);
 
         messageDispatcher.setHotwiredDataStream(new HotwiredDataStreamAdapter(10000) {
             @Override
             public void onHotwiredResponse(byte[] data) {
                 try {
                     ClearOutputBufferCommandResponse clearOutputBufferCommandResponse = new ClearOutputBufferCommandResponse(data);
-                    if (clearOutputBufferCommandResponse.hasBadBytes()) {
-                        Logger.getLogger(BluetoothUtils.class.getName()).log(Level.INFO, String.format("Bluetooth buffer needs to be cleared"));
-                    }
 
                     messageDispatcher.disableHotWire();
-                    bluetoothBroker.clearInputBuffer();
+
+                    if (clearOutputBufferCommandResponse.hasBadBytes()) {
+                        bluetoothBroker.clearInputBuffer();
+                        Logger.getLogger(BluetoothUtils.class.getName()).log(Level.INFO, String.format("Bluetooth buffer has been cleared"));
+                    }
                 } catch (CannotUnpackByteArrayException ex) {
                     Logger.getLogger(BluetoothUtils.class.getName()).log(Level.SEVERE, null, ex);
-                    fatalErrorOccured();
+                    container.resolveDependencies(smarthomesystem.SmartHomeSystem.class).terminateSmartHomeSystem();
                 }
             }
 
             @Override
             public void onResponseTimeout() {
-                fatalErrorOccured();
+                container.resolveDependencies(SmartHomeSystem.class).terminateSmartHomeSystem();
             }
         });
 
         try {
             bluetoothBroker.send(messageFactory.createReflectiveInstance(ClearOutputBufferCommand.class));
-        } catch (IllegalAccessException | PackingNotImplementedException | IOException ex) {
+        } catch (IOException | PackingNotImplementedException ex) {
             Logger.getLogger(BluetoothUtils.class.getName()).log(Level.SEVERE, null, ex);
+            container.resolveDependencies(SmartHomeSystem.class).terminateSmartHomeSystem();
         }
-    }
-
-    private void fatalErrorOccured() {
-        try {
-            bluetoothBroker.closeConnection();
-            Thread.sleep(1000);
-        } catch (IOException | InterruptedException ex1) {
-            Logger.getLogger(BluetoothUtils.class.getName()).log(Level.SEVERE, null, ex1);
-        }
-        System.exit(0);
     }
 }

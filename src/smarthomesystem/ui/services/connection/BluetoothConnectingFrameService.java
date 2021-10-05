@@ -43,50 +43,42 @@ public class BluetoothConnectingFrameService extends FrameService<BluetoothConne
         bluetoothConfig.setAddress(addressAndName.getKey());
         bluetoothConfig.setName(addressAndName.getValue());
 
-        try {
-            connectionService.setConnectionListener(new ConnectionListener() {
-                @Override
-                public void onInit() {
-                    frame.appearInTheCenterOfTheScreen();
-                    frame.appendToLog(String.format("Trying to connect to %s", bluetoothConfig.getName()));
-                }
+        connectionService.setConnectionListener(new ConnectionListener() {
+            @Override
+            public void onInit() {
+                frame.appearInTheCenterOfTheScreen();
+                frame.appendToLog(String.format("Trying to connect to %s", bluetoothConfig.getName()));
+            }
 
-                @Override
-                public void onRetry() {
-                    int initialRetryCount = connectionService.getRetryPolicy().getInitialRetryCount();
-                    frame.appendToLog(String.format("Retrying to connect to %s, attempt %d/%d", bluetoothConfig.getName(), initialRetryCount - connectionService.getRetryPolicy().getRetryCount() + 1, initialRetryCount));
-                }
+            @Override
+            public void onRetry() {
+                int initialRetryCount = connectionService.getRetryPolicy().getInitialRetryCount();
+                frame.appendToLog(String.format("Retrying to connect to %s, attempt %d/%d", bluetoothConfig.getName(), initialRetryCount - connectionService.getRetryPolicy().getRetryCount() + 1, initialRetryCount));
+            }
 
-                @Override
-                public void onSuccess() {
-                    frame.appendToLog(String.format("Connected to %s", bluetoothConfig.getName()));
-                    frame.showConnectedCheckmark(() -> {
-                        frame.setVisible(false);
-                        eventDispatcher.dispatchEvent(new BluetoothConnectionEstablished());
-                    });
-                }
+            @Override
+            public void onSuccess() {
+                frame.appendToLog(String.format("Connected to %s", bluetoothConfig.getName()));
+                frame.showConnectedCheckmark(() -> {
+                    frame.setVisible(false);
+                    eventDispatcher.dispatchEvent(new BluetoothConnectionEstablished());
+                });
+            }
 
-                @Override
-                public void onFailure() {
-                    frame.appendToLog(String.format("Failed to connect to %s", bluetoothConfig.getName()));
-                    frame.showFailedConnectionCrossmark(() -> {
-                        frame.setVisible(false);
+            @Override
+            public void onFailure() {
+                frame.appendToLog(String.format("Failed to connect to %s", bluetoothConfig.getName()));
+                frame.showFailedConnectionCrossmark(() -> {
+                    frame.setVisible(false);
 
-                        try {
-                            container.resolveDependencies(ConnectionFrame.class).setVisible(true);
-                        } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException | UnresolvableDependency ex) {
-                            Logger.getLogger(BluetoothConnectingFrameService.class.getName()).log(Level.SEVERE, null, ex);
-                        }
-                    });
-                }
-            });
+                    container.resolveDependencies(ConnectionFrame.class).setVisible(true);
+                });
+            }
+        });
 
-            connectionService.setRetryPolicy(new RetryConnectionPolicy(3));
+        connectionService.setRetryPolicy(new RetryConnectionPolicy(3));
 
-            connectionService.connectTo(bluetoothConfig, BluetoothBroker.class);
-        } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException | UnresolvableDependency | IllegalArgumentException ex) {
-            Logger.getLogger(BluetoothConnectingFrameService.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        connectionService.connectTo(bluetoothConfig, BluetoothBroker.class);
     }
 
 }

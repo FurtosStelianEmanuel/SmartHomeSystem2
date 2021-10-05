@@ -159,20 +159,12 @@ public class ConnectionFrame extends ServiceableFrame<ConnectionFrameService> {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        try {
-            service.bluetoothConnectionDesired(evt);
-        } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException | UnresolvableDependency ex) {
-            Logger.getLogger(ConnectionFrame.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        service.bluetoothConnectionDesired(evt);
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jLabel4MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel4MouseClicked
-        try {
-            dispose();
-            container.resolveDependencies(SmartHomeSystem.class).terminateSmartHomeSystem();
-        } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException | UnresolvableDependency | InterruptedException ex) {
-            Logger.getLogger(ConnectionFrame.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        dispose();
+        container.resolveDependencies(SmartHomeSystem.class).terminateSmartHomeSystem();
     }//GEN-LAST:event_jLabel4MouseClicked
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

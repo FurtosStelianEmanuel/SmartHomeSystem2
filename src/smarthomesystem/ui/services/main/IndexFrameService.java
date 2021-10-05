@@ -46,7 +46,7 @@ public class IndexFrameService extends FrameService<IndexFrame> {
         messageDispatcher.addListener(distanceSensorQueryResult);
     }
 
-    public void sendColor() throws IOException, IllegalAccessException, PackingNotImplementedException, NoSuchMethodException, InvocationTargetException, InstantiationException, UnresolvableDependency {
+    public void sendColor() throws IOException, PackingNotImplementedException {
         BluetoothBroker meinBroker = container.resolveDependencies(BluetoothBroker.class);
         ModulatePulseWidthCommand command = messageFactory.createReflectiveInstance(ModulatePulseWidthCommand.class);
         command.modulation = frame.jSlider1.getValue();
@@ -54,7 +54,7 @@ public class IndexFrameService extends FrameService<IndexFrame> {
         meinBroker.send(command);
     }
 
-    public void getLightAmount() throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException, UnresolvableDependency, PackingNotImplementedException, IOException {
+    public void getLightAmount() throws IOException, PackingNotImplementedException {
         BluetoothBroker meinBroker = container.resolveDependencies(BluetoothBroker.class);
         AnalogValueQuery analogPinQuery = messageFactory.createReflectiveInstance(AnalogValueQuery.class);
         analogPinQuery.pin = 0;

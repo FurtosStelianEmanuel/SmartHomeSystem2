@@ -44,8 +44,8 @@ public class BluetoothUtils {
             Logger.getLogger(BluetoothUtils.class.getName()).log(Level.SEVERE, null, ex);
             return;
         }
-        
-        HotwiredDataStreamAdapter hotwiredDataStreamAdapter = new HotwiredDataStreamAdapter(10000) {
+
+        messageDispatcher.setHotwiredDataStream(new HotwiredDataStreamAdapter(10000) {
             @Override
             public void onHotwiredResponse(byte[] data) {
                 try {
@@ -66,8 +66,7 @@ public class BluetoothUtils {
             public void onResponseTimeout() {
                 fatalErrorOccured();
             }
-        };
-        messageDispatcher.setHotwiredDataStream(hotwiredDataStreamAdapter);
+        });
 
         try {
             bluetoothBroker.send(messageFactory.createReflectiveInstance(ClearOutputBufferCommand.class));

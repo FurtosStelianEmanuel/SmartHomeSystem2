@@ -124,23 +124,17 @@ public class BluetoothConnectionFrameService extends FrameService<BluetoothConne
                 }
             });
         } catch (BluetoothStateException ex) {
+            Logger.getLogger(BluetoothConnectionFrameService.class.getName()).log(Level.WARNING, ex.getClass().getName(), ex);
         }
     }
 
     private void handleDeserializedSelectedDevice(List<Pair<String, String>> deserializedDevices, Pair<String, String> deserializedSelectedDevice) {
-        int index = -1;
         for (int i = 0; i < deserializedDevices.size(); i++) {
             Pair<String, String> deserializedDevice = deserializedDevices.get(i);
             if (deserializedDevice.getKey().equals(deserializedSelectedDevice.getKey())) {
-                index = i;
+                frame.selectDevice(i);
                 break;
             }
         }
-
-        if (index == -1) {
-            return;
-        }
-
-        frame.selectDevice(index);
     }
 }

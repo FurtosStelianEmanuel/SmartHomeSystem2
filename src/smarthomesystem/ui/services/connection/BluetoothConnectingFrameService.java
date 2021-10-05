@@ -77,7 +77,6 @@ public class BluetoothConnectingFrameService extends FrameService<BluetoothConne
         });
 
         connectionService.setRetryPolicy(new RetryConnectionPolicy(3));
-
         connectionService.connectTo(bluetoothConfig, BluetoothBroker.class);
     }
 

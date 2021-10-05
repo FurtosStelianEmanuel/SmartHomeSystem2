@@ -58,10 +58,8 @@ public class BluetoothConnectionFrame extends ServiceableFrame<BluetoothConnecti
     }
 
     public void addDevicesToTable(List<Pair<String, String>> addressesAndNames) {
-        DefaultTableModel devices = (DefaultTableModel) jTable1.getModel();
-
         for (Pair<String, String> addressAndName : addressesAndNames) {
-            devices.addRow(new Object[]{addressAndName.getKey(), addressAndName.getValue()});
+            addDeviceToTable(addressAndName);
         }
     }
 
@@ -98,7 +96,7 @@ public class BluetoothConnectionFrame extends ServiceableFrame<BluetoothConnecti
         }
     }
 
-    private void showPreviousFrame() {
+    private void showConnectionFrame() {
         container.resolveDependencies(ConnectionFrame.class).setVisible(true);
     }
 
@@ -285,7 +283,7 @@ public class BluetoothConnectionFrame extends ServiceableFrame<BluetoothConnecti
 
     private void jLabel5MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel5MouseClicked
         setVisible(false);
-        showPreviousFrame();
+        showConnectionFrame();
     }//GEN-LAST:event_jLabel5MouseClicked
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

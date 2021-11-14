@@ -6,7 +6,9 @@
 package smarthomesystem.events.handlers;
 
 import messaging.events.EventHandler;
+import messaging.events.MicroControllerRegistered;
 import smarthomesystem.events.models.*;
+import smarthomesystem.repos.MicroControllerRepository;
 
 /**
  *
@@ -14,11 +16,17 @@ import smarthomesystem.events.models.*;
  */
 public class ArduinoPeripheralsEventHandler extends EventHandler {
 
+    private final MicroControllerRepository microControllerRepository;
 
-    public ArduinoPeripheralsEventHandler() {
+    public ArduinoPeripheralsEventHandler(MicroControllerRepository microControllerRepository) {
+        this.microControllerRepository = microControllerRepository;
     }
 
     public void handle(DoorOpened event) {
         System.out.println("facutam handle si la event");
+    }
+
+    public void handle(MicroControllerRegistered event) {
+        microControllerRepository.activateMicroController(event.microController);
     }
 }

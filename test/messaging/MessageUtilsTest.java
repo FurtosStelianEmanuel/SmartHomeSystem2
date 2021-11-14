@@ -6,8 +6,6 @@
 package messaging;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -120,21 +118,5 @@ public class MessageUtilsTest {
 
         assertEquals(10, unpackedResult.identifier);
         assertEquals(12, unpackedResult.calculationResult);
-    }
-
-    @Test
-    public void isUnpackable_whenRawDataContainsAnIdentifier_returnTrue() {
-        when(messageIdentifierGeneratorMock.identifierExists((byte) 12)).thenReturn(true);
-
-        boolean isUnpackable = messageUtils.isUnpackable(new byte[]{(byte) 5, (byte) 5, (byte) 5, (byte) 12});
-
-        assertTrue(isUnpackable);
-    }
-
-    @Test
-    public void isUnpackable_whenRawDataDoesNotContainAnIdentifier_returnFalse() {
-        boolean isUnpackable = messageUtils.isUnpackable(new byte[]{(byte) 5, (byte) 5, (byte) 5, (byte) 12});
-
-        assertFalse(isUnpackable);
     }
 }

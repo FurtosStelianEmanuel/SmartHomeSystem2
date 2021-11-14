@@ -9,6 +9,7 @@ import annotations.Injectable;
 import data.Factory;
 import messaging.MessageDispatcher;
 import messaging.bluetooth.threading.BluetoothInputWorker;
+import messaging.events.EventDispatcher;
 
 /**
  *
@@ -18,13 +19,15 @@ import messaging.bluetooth.threading.BluetoothInputWorker;
 public class BluetoothInputWorkerFactory extends Factory<BluetoothInputWorker> {
 
     private final MessageDispatcher messageDispatcher;
+    private final EventDispatcher eventDispatcher;
 
-    public BluetoothInputWorkerFactory(MessageDispatcher messageDispatcher) {
+    public BluetoothInputWorkerFactory(MessageDispatcher messageDispatcher, EventDispatcher eventDispatcher) {
         this.messageDispatcher = messageDispatcher;
+        this.eventDispatcher = eventDispatcher;
     }
 
     @Override
     public BluetoothInputWorker createNewInstance() {
-        return new BluetoothInputWorker(messageDispatcher);
+        return new BluetoothInputWorker(messageDispatcher, eventDispatcher);
     }
 }

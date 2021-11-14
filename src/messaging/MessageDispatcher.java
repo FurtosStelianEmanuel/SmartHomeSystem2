@@ -29,38 +29,23 @@ import static smarthomesystem.SmartHomeSystem.container;
  */
 public class MessageDispatcher {
 
+    private final Reflections reflections;
     private final MessageUtils messageUtils;
+    private final MessageDispatcherWorker messageDispatcherWorker;
+
     private List<ResponseListener> listeners;
     private List<ResponseListener> listenersPendingDeletion;
     private byte[] messageToDispatch;
-    private final MessageDispatcherWorker messageDispatcherWorker;
     private Map<Class<? extends Message>, Pair<CommandHandler, Method>> commandHandlers;
     private HotwiredDataStreamAdapter hotwiredDataStreamAdapter;
 
-    public MessageDispatcher(MessageUtils messageUtils, MessageDispatcherWorker messageDispatcherWorker) {
+    public MessageDispatcher(Reflections reflections, MessageUtils messageUtils, MessageDispatcherWorker messageDispatcherWorker) {
+        this.reflections = reflections;
         this.messageUtils = messageUtils;
+        this.messageDispatcherWorker = messageDispatcherWorker;
         listeners = new ArrayList<>();
         listenersPendingDeletion = new ArrayList<>();
-        this.messageDispatcherWorker = messageDispatcherWorker;
         commandHandlers = new HashMap<>();
-    }
-
-    public void setHotwiredDataStream(HotwiredDataStreamAdapter hotwiredDataStreamAdapter) {
-        if (hotwiredDataStreamAdapter == null) {
-            return;
-        }
-
-        this.hotwiredDataStreamAdapter = hotwiredDataStreamAdapter;
-        this.hotwiredDataStreamAdapter.setEnabled(true);
-
-        new Timer().schedule(new TimerTask() {
-            @Override
-            public void run() {
-                if (hotwiredDataStreamAdapter.isEnabled()) {
-                    hotwiredDataStreamAdapter.onResponseTimeout();
-                }
-            }
-        }, hotwiredDataStreamAdapter.getTimeout());
     }
 
     public void queueMessage(byte[] data) {
@@ -83,19 +68,14 @@ public class MessageDispatcher {
         }
     }
 
-    public void addListener(ResponseListener responseListener) {
-        responseListener.setIdentifier(messageUtils.getMessageIdentifierGenerator().getIdentifier(responseListener.getCallback().getType()));
-        listeners.add(responseListener);
-    }
-
     public void initHandlers() throws HandlersAlreadyInitializedException {
         if (!commandHandlers.isEmpty()) {
             throw new HandlersAlreadyInitializedException();
         }
 
-        Reflections reflections = container.resolveDependencies(Reflections.class);
         Set<Class<? extends CommandHandler>> commandHandlerDescendants = reflections.getSubTypesOf(CommandHandler.class);
         Iterator<Class<? extends CommandHandler>> iterator = commandHandlerDescendants.iterator();
+
         while (iterator.hasNext()) {
             Class<? extends CommandHandler> next = iterator.next();
             CommandHandler commandHandler = container.resolveDependencies(next);
@@ -105,6 +85,31 @@ public class MessageDispatcher {
                 }
             }
         }
+    }
+
+    public void addListener(ResponseListener responseListener) {
+        responseListener.setIdentifier(messageUtils.getMessageIdentifierGenerator().getIdentifier(responseListener.getCallback().getType()));
+        if (!listeners.contains(responseListener)) {
+            listeners.add(responseListener);
+        }
+    }
+
+    public void setHotwiredDataStream(HotwiredDataStreamAdapter hotwiredDataStreamAdapter) {
+        if (hotwiredDataStreamAdapter == null) {
+            return;
+        }
+
+        this.hotwiredDataStreamAdapter = hotwiredDataStreamAdapter;
+        this.hotwiredDataStreamAdapter.setEnabled(true);
+
+        new Timer().schedule(new TimerTask() {
+            @Override
+            public void run() {
+                if (hotwiredDataStreamAdapter.isEnabled()) {
+                    hotwiredDataStreamAdapter.onResponseTimeout();
+                }
+            }
+        }, hotwiredDataStreamAdapter.getTimeout());
     }
 
     private void regularDispatch() {
@@ -132,7 +137,7 @@ public class MessageDispatcher {
         for (int i = 0; i < listeners.size(); i++) {
             ResponseListener listener = listeners.get(i);
             if (listener.getIdentifier() == messageToDispatch[0]) {
-                callWaitingListener(listener, messageToDispatch);
+                callWaitingListener(listener);
                 determineListenerDeletion(listener);
             }
         }
@@ -140,12 +145,12 @@ public class MessageDispatcher {
         cleanupListeners();
     }
 
-    private void callWaitingListener(ResponseListener listener, byte[] rawData) {
+    private void callWaitingListener(ResponseListener listener) {
         if (!listener.timeoutOccured()) {
-            listener.getCallback().onResponse(messageUtils.unpack(rawData, listener.getCallback().getType()));
+            listener.getCallback().onResponse(messageUtils.unpack(messageToDispatch, listener.getCallback().getType()));
             listener.setResponseReceived(true);
         } else {
-            listener.responseArrivedAfterTimeout(rawData);
+            listener.responseArrivedAfterTimeout(messageToDispatch);
         }
     }
 
@@ -195,5 +200,9 @@ public class MessageDispatcher {
 
     public void disableHotWire() {
         hotwiredDataStreamAdapter.setEnabled(false);
+    }
+
+    public Map<Class<? extends Message>, Pair<CommandHandler, Method>> getCommandHandlers() {
+        return commandHandlers;
     }
 }

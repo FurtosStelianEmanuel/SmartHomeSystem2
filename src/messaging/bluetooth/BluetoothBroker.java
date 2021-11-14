@@ -14,7 +14,6 @@ import encoding.EncodingAlgorithm;
 import java.io.IOException;
 import messaging.MessageBroker;
 import messaging.MessageDispatcher;
-import messaging.MessageFactory;
 import messaging.MessageUtils;
 import messaging.bluetooth.threading.BluetoothInputWorker;
 import messaging.bluetooth.threading.BluetoothOutputWorker;
@@ -28,10 +27,7 @@ import messaging.bluetooth.threading.factories.BluetoothOutputWorkerFactory;
 @Injectable
 public class BluetoothBroker extends MessageBroker<BluetoothConfig, EncodingAlgorithm, BluetoothInputWorkerFactory, BluetoothOutputWorkerFactory, BluetoothInputWorker, BluetoothOutputWorker> {
 
-    private final MessageFactory messageFactory;
-
     private final BluetoothModuleApiWrapper bluetoothWrapper;
-    private final BluetoothUtils bluetoothUtils;
 
     public BluetoothBroker(
             EncodingAlgorithm encodingAlgorithm,
@@ -41,14 +37,10 @@ public class BluetoothBroker extends MessageBroker<BluetoothConfig, EncodingAlgo
             MessageDispatcherWorker messageDispatcherWorker,
             MessageDispatcher messageDispatcher,
             MessageUtils messageUtils,
-            MessageFactory messageFactory,
-            BluetoothModuleApiWrapper bluetoothWrapper,
-            BluetoothUtils bluetoothUtils
+            BluetoothModuleApiWrapper bluetoothWrapper
     ) {
         super(encodingAlgorithm, threadPoolSupervisor, inputWorkerFactory, outputWorkerFactory, messageDispatcher, messageDispatcherWorker, messageUtils);
-        this.messageFactory = messageFactory;
         this.bluetoothWrapper = bluetoothWrapper;
-        this.bluetoothUtils = bluetoothUtils;
         this.messageDispatcherWorker = messageDispatcherWorker;
     }
 
@@ -81,7 +73,10 @@ public class BluetoothBroker extends MessageBroker<BluetoothConfig, EncodingAlgo
 
         threadPoolSupervisor.startThread(outputWorker);
         threadPoolSupervisor.startThread(inputWorker);
-        threadPoolSupervisor.startThread(messageDispatcherWorker);
+
+        if (!messageDispatcherWorker.isAlive()) {
+            threadPoolSupervisor.startThread(messageDispatcherWorker);
+        }
     }
 
     @Override

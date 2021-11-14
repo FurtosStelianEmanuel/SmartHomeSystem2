@@ -55,6 +55,10 @@ public class ClearOutputBufferCommandResponse extends Response {
         throw new CannotUnpackByteArrayException();
     }
 
+    public ClearOutputBufferCommandResponse() {
+        super((byte) -127);
+    }
+
     public boolean hasBadBytes() {
         return hasBadBytes;
     }

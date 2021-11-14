@@ -5,17 +5,17 @@
  */
 package messaging.bluetooth.threading;
 
-import threading.BackgroundWorker;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import messaging.DataSender;
+import threading.IOWorker;
 
 /**
  *
  * @author Manel
  */
-public class BluetoothOutputWorker extends BackgroundWorker implements DataSender {
+public class BluetoothOutputWorker extends IOWorker implements DataSender {
 
     @Override
     public synchronized void run() {
@@ -25,8 +25,10 @@ public class BluetoothOutputWorker extends BackgroundWorker implements DataSende
                 emptyOutputStream();
             } catch (InterruptedException | IOException ex) {
                 Logger.getLogger(BluetoothOutputWorker.class.getName()).log(Level.SEVERE, null, ex);
+                alive = false;
             }
         }
+
         printTerminationMessage();
     }
 

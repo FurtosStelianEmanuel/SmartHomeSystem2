@@ -17,12 +17,10 @@ import java.util.logging.Logger;
 import messaging.bluetooth.BluetoothBroker;
 import messaging.bluetooth.BluetoothConfig;
 import messaging.bluetooth.BluetoothModuleApiWrapper;
-import messaging.bluetooth.BluetoothUtils;
 import messaging.bluetooth.threading.BluetoothInputWorker;
 import messaging.bluetooth.threading.BluetoothOutputWorker;
 import messaging.bluetooth.threading.factories.BluetoothInputWorkerFactory;
 import messaging.bluetooth.threading.factories.BluetoothOutputWorkerFactory;
-import messaging.commands.ClearOutputBufferCommand;
 import messaging.exceptions.PackingNotImplementedException;
 import org.junit.Test;
 import smarthomesystem.TestUtils;
@@ -47,8 +45,6 @@ public class BluetoothBrokerTest extends TestUtils {
     BluetoothModuleApiWrapper bluetoothModuleApiWrapperMock;
 
     MessageIdentifierGenerator messageIdentifierGeneratorMock;
-    MessageFactory messageFactoryMock;
-    BluetoothUtils bluetoothUtilsMock;
 
     public BluetoothBrokerTest() {
         encodingAlgorithmMock = mock(EncodingAlgorithm.class);
@@ -59,8 +55,6 @@ public class BluetoothBrokerTest extends TestUtils {
         messageUtilsMock = mock(MessageUtils.class);
         bluetoothModuleApiWrapperMock = mock(BluetoothModuleApiWrapper.class);
         messageIdentifierGeneratorMock = mock(MessageIdentifierGenerator.class);
-        messageFactoryMock = mock(MessageFactory.class);
-        bluetoothUtilsMock = mock(BluetoothUtils.class);
         messageDispatcherMock = mock(MessageDispatcher.class);
 
         bluetoothBroker = new BluetoothBroker(
@@ -71,9 +65,7 @@ public class BluetoothBrokerTest extends TestUtils {
                 messageDispatcherWorkerMock,
                 messageDispatcherMock,
                 messageUtilsMock,
-                messageFactoryMock,
-                bluetoothModuleApiWrapperMock,
-                bluetoothUtilsMock
+                bluetoothModuleApiWrapperMock
         );
     }
 
@@ -110,12 +102,11 @@ public class BluetoothBrokerTest extends TestUtils {
     public void startBackgroundWorkers_success() throws ThreadNotFoundException, ThreadAlreadyStartedException, IllegalArgumentException, IllegalAccessException, PackingNotImplementedException {
         BluetoothInputWorker inputWorkerMock = mock(BluetoothInputWorker.class);
         BluetoothOutputWorker outputWorkerMock = mock(BluetoothOutputWorker.class);
-        ClearOutputBufferCommand clearOutputBufferCommandMock = mock(ClearOutputBufferCommand.class);
 
         when(inputWorkerFactoryMock.createNewInstance()).thenReturn(inputWorkerMock);
         when(outputWorkerFactoryMock.createNewInstance()).thenReturn(outputWorkerMock);
         when(messageUtilsMock.getMessageIdentifierGenerator()).thenReturn(messageIdentifierGeneratorMock);
-        when(messageFactoryMock.createReflectiveInstance(ClearOutputBufferCommand.class)).thenReturn(clearOutputBufferCommandMock);
+
         bluetoothBroker.inputStream = mock(InputStream.class);
         bluetoothBroker.outputStream = mock(OutputStream.class);
 
@@ -162,7 +153,8 @@ public class BluetoothBrokerTest extends TestUtils {
             verify(inputStreamMock).close();
             verify(outputStreamMock).close();
             verify(outputStreamMock).flush();
-            verify(threadPoolSupervisorMock).terminateAllThreads();
+            verify(threadPoolSupervisorMock).terminateIOWorkers();
+            verify(threadPoolSupervisorMock).removeIOWorkers();
         }
     }
 

@@ -10,6 +10,7 @@ import threading.exceptions.ThreadAlreadyStartedException;
 import threading.exceptions.ThreadNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -54,5 +55,19 @@ public class ThreadPoolSupervisor {
             throw new ThreadAlreadyStartedException();
         }
         thread.start();
+    }
+
+    public void removeIOWorkers() {
+        threadPool = threadPool.stream().filter(t -> !(t instanceof IOWorker)).collect(Collectors.toList());
+    }
+
+    public void terminateIOWorkers() {
+        for (BackgroundWorker backgroundWorker : threadPool) {
+            if (!(backgroundWorker instanceof IOWorker)) {
+                continue;
+            }
+            
+            backgroundWorker.interrupt();
+        }
     }
 }

@@ -10,7 +10,6 @@ import smarthomesystem.SmartHomeSystem;
 import smarthomesystem.ui.ServiceableFrame;
 import smarthomesystem.ui.services.connection.ConnectionFrameService;
 import static smarthomesystem.SmartHomeSystem.container;
-import smarthomesystem.ui.ColorPallete;
 
 /**
  *
@@ -19,15 +18,7 @@ import smarthomesystem.ui.ColorPallete;
 @Injectable
 public class ConnectionFrame extends ServiceableFrame<ConnectionFrameService> {
 
-    private final ColorPallete colorPallete;
-
-    /**
-     * Creates new form ConnectionFrame
-     *
-     * @param colorPallete
-     */
-    public ConnectionFrame(ColorPallete colorPallete) {
-        this.colorPallete = colorPallete;
+    public ConnectionFrame() {
         initComponents();
         setRoundCorners();
     }
@@ -91,7 +82,6 @@ public class ConnectionFrame extends ServiceableFrame<ConnectionFrameService> {
 
         jPanel1.setLayout(new java.awt.GridLayout(1, 0));
 
-        jButton1.setBackground(colorPallete.getC2());
         jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/smarthomesystem/ui/resources/bluetooth_64x64.png"))); // NOI18N
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -100,11 +90,9 @@ public class ConnectionFrame extends ServiceableFrame<ConnectionFrameService> {
         });
         jPanel1.add(jButton1);
 
-        jButton2.setBackground(colorPallete.getC2());
         jButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/smarthomesystem/ui/resources/usb_64x64.png"))); // NOI18N
         jPanel1.add(jButton2);
 
-        jButton3.setBackground(colorPallete.getC2());
         jButton3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/smarthomesystem/ui/resources/lan_64x64.png"))); // NOI18N
         jPanel1.add(jButton3);
 

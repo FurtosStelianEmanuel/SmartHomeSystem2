@@ -6,8 +6,7 @@
 package smarthomesystem.ui.frames.connection;
 
 import annotations.Injectable;
-import java.util.Timer;
-import java.util.TimerTask;
+import misc.gifblender.*;
 import smarthomesystem.animation.AnimationListener;
 import smarthomesystem.ui.ServiceableFrame;
 import smarthomesystem.ui.services.connection.BluetoothConnectingFrameService;
@@ -19,10 +18,21 @@ import smarthomesystem.ui.services.connection.BluetoothConnectingFrameService;
 @Injectable
 public class BluetoothConnectingFrame extends ServiceableFrame<BluetoothConnectingFrameService> {
 
+    public BlendOption blendOption;
+    public BlendListener blendListener;
+    AnimationListener animationListener;
+
     /**
      * Creates new form WirelessConnectingForm
      */
     public BluetoothConnectingFrame() {
+        blendOption = new BlendOption(getClass().getResource("/smarthomesystem/ui/resources/connecting-wireless_300x225.gif"), 128, 139);
+        blendListener = new BlendListenerAdapter() {
+            @Override
+            public void onSecondGifAboutToRestart() {
+                animationListener.onAnimationTimeout();
+            }
+        };
         initComponents();
     }
 
@@ -34,7 +44,7 @@ public class BluetoothConnectingFrame extends ServiceableFrame<BluetoothConnecti
     @Override
     public void setVisible(boolean isVisible) {
         if (isVisible) {
-            jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/smarthomesystem/ui/resources/connecting-wireless_300x225.gif")));
+            gifBlender.reset();
         } else {
             appendToLog("- - - - - - - - - - - - - - - - ");
         }
@@ -43,23 +53,15 @@ public class BluetoothConnectingFrame extends ServiceableFrame<BluetoothConnecti
     }
 
     public void showConnectedCheckmark(AnimationListener animationListener) {
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/smarthomesystem/ui/resources/checkmark_225x225.gif")));
-        new Timer().schedule(new TimerTask() {
-            @Override
-            public void run() {
-                animationListener.onAnimationTimeout();
-            }
-        }, 1500);
+        this.animationListener = animationListener;
+        gifBlender.getBlendOption().setSecondGif(getClass().getResource("/smarthomesystem/ui/resources/wireless_to_checkmark.gif"), 62);
+        gifBlender.triggerTransition();
     }
 
     public void showFailedConnectionCrossmark(AnimationListener animationListener) {
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/smarthomesystem/ui/resources/crossmark_225x225.gif")));
-        new Timer().schedule(new TimerTask() {
-            @Override
-            public void run() {
-                animationListener.onAnimationTimeout();
-            }
-        }, 1500);
+        this.animationListener = animationListener;
+        gifBlender.getBlendOption().setSecondGif(getClass().getResource("/smarthomesystem/ui/resources/wireless_to_cross.gif"), 30);
+        gifBlender.triggerTransition();
     }
 
     /**
@@ -72,21 +74,29 @@ public class BluetoothConnectingFrame extends ServiceableFrame<BluetoothConnecti
     private void initComponents() {
 
         jPanel1 = new javax.swing.JPanel();
-        jLabel1 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTextArea1 = new javax.swing.JTextArea();
+        gifBlender = new misc.gifblender.GifBlender(blendOption, blendListener);
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setUndecorated(true);
-
-        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/smarthomesystem/ui/resources/connecting-wireless_300x225.gif"))); // NOI18N
 
         jTextArea1.setEditable(false);
         jTextArea1.setColumns(20);
         jTextArea1.setFont(new java.awt.Font("Times New Roman", 0, 14)); // NOI18N
         jTextArea1.setRows(5);
         jScrollPane1.setViewportView(jTextArea1);
+
+        javax.swing.GroupLayout gifBlenderLayout = new javax.swing.GroupLayout(gifBlender);
+        gifBlender.setLayout(gifBlenderLayout);
+        gifBlenderLayout.setHorizontalGroup(
+            gifBlenderLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 0, Short.MAX_VALUE)
+        );
+        gifBlenderLayout.setVerticalGroup(
+            gifBlenderLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 216, Short.MAX_VALUE)
+        );
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -95,15 +105,15 @@ public class BluetoothConnectingFrame extends ServiceableFrame<BluetoothConnecti
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, 497, Short.MAX_VALUE)
-                    .addComponent(jScrollPane1))
+                    .addComponent(gifBlender, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 413, Short.MAX_VALUE))
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel1)
+                .addComponent(gifBlender, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -124,7 +134,7 @@ public class BluetoothConnectingFrame extends ServiceableFrame<BluetoothConnecti
     }// </editor-fold>//GEN-END:initComponents
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    public javax.swing.JLabel jLabel1;
+    private misc.gifblender.GifBlender gifBlender;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     public javax.swing.JTextArea jTextArea1;

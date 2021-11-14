@@ -6,12 +6,17 @@
 package smarthomesystem.ui;
 
 import annotations.Injectable;
+import messaging.events.EventDispatcher;
 import java.awt.Color;
+import java.awt.Font;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.UIDefaults;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
-import smarthomesystem.ui.frames.connection.ConnectionFrame;
+import javax.swing.plaf.ColorUIResource;
+import javax.swing.plaf.nimbus.NimbusLookAndFeel;
+import messaging.events.ColorPalleteChanged;
 
 /**
  *
@@ -20,64 +25,87 @@ import smarthomesystem.ui.frames.connection.ConnectionFrame;
 @Injectable
 public class ColorPallete {
 
-    Color c1 = new Color(21, 21, 21);
-    Color c2 = new Color(48, 27, 63);
-    Color c3 = new Color(60, 65, 92);
-    Color c4 = new Color(180, 165, 165);
+    private final EventDispatcher eventDispatcher;
 
-    public ColorPallete() {
+    public Color primaryColor = new Color(21, 21, 21);
+    Color secondaryColor = new Color(48, 27, 63);
+    Color thirdColor = new Color(60, 65, 92);
+    Color fourthColor = new Color(180, 165, 165);
+
+    public ColorPallete(EventDispatcher eventDispatcher) {
+        this.eventDispatcher = eventDispatcher;
         setUIColorPallete();
     }
 
-    public Color getC1() {
-        return c1;
-    }
+    public void set(Color primaryColor, Color secondaryColor, Color thirdColor, Color fourthColor) {
+        ColorPalleteChanged event = new ColorPalleteChanged() {
+            {
+                setOldPrimaryColor(ColorPallete.this.primaryColor);
+                setOldSecondaryColor(ColorPallete.this.secondaryColor);
+                setOldThirdColor(ColorPallete.this.thirdColor);
+                setOldFourthColor(ColorPallete.this.fourthColor);
 
-    public Color getC2() {
-        return c2;
-    }
-
-    public Color getC3() {
-        return c3;
-    }
-
-    public Color getC4() {
-        return c4;
-    }
-    
-    public void set(Color c1, Color c2, Color c3, Color c4) {
-        this.c1 = c1;
-        this.c2 = c2;
-        this.c3 = c3;
-        this.c4 = c4;
+                setNewPrimaryColor(primaryColor);
+                setNewSecondaryColor(secondaryColor);
+                setNewThirdColor(thirdColor);
+                setNewFourthColor(fourthColor);
+            }
+        };
+        this.primaryColor = primaryColor;
+        this.secondaryColor = secondaryColor;
+        this.thirdColor = thirdColor;
+        this.fourthColor = fourthColor;
         setUIColorPallete();
+        eventDispatcher.dispatchEvent(event);
     }
 
     private void setUIColorPallete() {
-        UIManager.put("control", c1);
-        UIManager.put("info", c1);
-        UIManager.put("nimbusBase", c1);
-        UIManager.put("nimbusAlertYellow", new Color(248, 187, 0));
-        UIManager.put("nimbusDisabledText", c1);
-        UIManager.put("nimbusFocus", c4);
-        UIManager.put("nimbusGreen", new Color(176, 179, 50));
-        UIManager.put("nimbusInfoBlue", new Color(66, 139, 221));
-        UIManager.put("nimbusLightBackground", c2);
-        UIManager.put("nimbusOrange", new Color(191, 98, 4));
-        UIManager.put("nimbusRed", new Color(169, 46, 34));
-        UIManager.put("nimbusSelectedText", new Color(255, 255, 255));
-        UIManager.put("nimbusSelectionBackground", new Color(104, 93, 156));
-        UIManager.put("Button.background", c2);
-        UIManager.put("text", c4);
         try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
+            UIManager.setLookAndFeel(new NimbusLookAndFeel() {
+                @Override
+                public UIDefaults getDefaults() {
+                    UIDefaults ret = super.getDefaults();
+                    ret.put("defaultFont", new Font("Times New Roman", Font.PLAIN, 18));
+                    ret.put("control", primaryColor);
+                    ret.put("nimbusBase", primaryColor);
+                    ret.put("Panel.background", primaryColor);
+                    ret.put("nimbusFocus", fourthColor);
+                    ret.put("text", fourthColor);
+                    ret.put("Table.alternateRowColor", lowerBrightness(secondaryColor, 0.6));
+                    ret.put("Table:\"Table.cellRenderer\".background", new ColorUIResource(lowerBrightness(secondaryColor, 0.3)));
+                    ret.put("Table[Enabled+Selected].textBackground", secondaryColor);
+                    ret.put("TextArea.background", secondaryColor);
+                    ret.put("TabbedPane.background", secondaryColor);
+                    ret.put("Button.background", secondaryColor);
+                    return ret;
                 }
-            }
-        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex) {
-            Logger.getLogger(ConnectionFrame.class.getName()).log(Level.SEVERE, null, ex);
+            });
+        } catch (UnsupportedLookAndFeelException ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
         }
+    }
+
+    public Color lowerBrightness(Color color, double brightness) {
+        return new Color(
+                (int) (color.getRed() * brightness),
+                (int) (color.getGreen() * brightness),
+                (int) (color.getBlue() * brightness)
+        );
+    }
+
+    public Color getPrimaryColor() {
+        return primaryColor;
+    }
+
+    public Color getSecondaryColor() {
+        return secondaryColor;
+    }
+
+    public Color getThirdColor() {
+        return thirdColor;
+    }
+
+    public Color getFourthColor() {
+        return fourthColor;
     }
 }

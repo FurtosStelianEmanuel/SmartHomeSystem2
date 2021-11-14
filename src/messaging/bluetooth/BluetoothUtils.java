@@ -15,6 +15,8 @@ import messaging.commands.ClearOutputBufferCommand;
 import messaging.commands.responses.ClearOutputBufferCommandResponse;
 import messaging.exceptions.PackingNotImplementedException;
 import messaging.HotwiredDataStreamAdapter;
+import messaging.MessageBroker;
+import messaging.ResponseCallback;
 import messaging.exceptions.CannotUnpackByteArrayException;
 import smarthomesystem.SmartHomeSystem;
 import static smarthomesystem.SmartHomeSystem.container;
@@ -29,28 +31,23 @@ public class BluetoothUtils {
     private final MessageFactory messageFactory;
     private final MessageDispatcher messageDispatcher;
 
-    private BluetoothBroker bluetoothBroker;
+    private MessageBroker messageBroker;
+    private ResponseCallback responseCallback;
 
     public BluetoothUtils(MessageFactory messageFactory, MessageDispatcher messageDispatcher) {
         this.messageFactory = messageFactory;
         this.messageDispatcher = messageDispatcher;
     }
 
-    public void clearArduinoCommunication() {
-        bluetoothBroker = container.resolveDependencies(BluetoothBroker.class);
+    public void clearArduinoCommunication(ResponseCallback responseCallback) {
+        messageBroker = container.resolveDependencies(MessageBroker.class);
+        this.responseCallback = responseCallback;
 
         messageDispatcher.setHotwiredDataStream(new HotwiredDataStreamAdapter(10000) {
             @Override
             public void onHotwiredResponse(byte[] data) {
                 try {
-                    ClearOutputBufferCommandResponse clearOutputBufferCommandResponse = new ClearOutputBufferCommandResponse(data);
-
-                    messageDispatcher.disableHotWire();
-
-                    if (clearOutputBufferCommandResponse.hasBadBytes()) {
-                        bluetoothBroker.clearInputBuffer();
-                        Logger.getLogger(BluetoothUtils.class.getName()).log(Level.INFO, String.format("Bluetooth buffer has been cleared"));
-                    }
+                    arduinoCommunicationCleared(new ClearOutputBufferCommandResponse(data));
                 } catch (CannotUnpackByteArrayException ex) {
                     Logger.getLogger(BluetoothUtils.class.getName()).log(Level.SEVERE, null, ex);
                     container.resolveDependencies(smarthomesystem.SmartHomeSystem.class).terminateSmartHomeSystem();
@@ -64,10 +61,21 @@ public class BluetoothUtils {
         });
 
         try {
-            bluetoothBroker.send(messageFactory.createReflectiveInstance(ClearOutputBufferCommand.class));
-        } catch (IOException | PackingNotImplementedException ex) {
+            Thread.sleep(100);
+            messageBroker.send(messageFactory.createReflectiveInstance(ClearOutputBufferCommand.class));
+        } catch (IOException | PackingNotImplementedException | InterruptedException ex) {
             Logger.getLogger(BluetoothUtils.class.getName()).log(Level.SEVERE, null, ex);
             container.resolveDependencies(SmartHomeSystem.class).terminateSmartHomeSystem();
+        }
+    }
+
+    public void arduinoCommunicationCleared(ClearOutputBufferCommandResponse response) {
+        messageDispatcher.disableHotWire();
+        responseCallback.onResponse(response);
+
+        if (response.hasBadBytes()) {
+            ((BluetoothBroker) messageBroker).clearInputBuffer();
+            Logger.getLogger(BluetoothUtils.class.getName()).log(Level.INFO, String.format("Bluetooth buffer has been cleared"));
         }
     }
 }

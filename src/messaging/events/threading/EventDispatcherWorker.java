@@ -15,6 +15,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.util.Pair;
 import messaging.events.Event;
+import messaging.events.EventHandler;
 import messaging.exceptions.NoHandlerForEventException;
 import threading.BackgroundWorker;
 
@@ -25,7 +26,7 @@ import threading.BackgroundWorker;
 public class EventDispatcherWorker extends BackgroundWorker {
 
     private BlockingQueue<Event> eventsToDispatch;
-    private Map<Class<? extends Event>, List<Pair<Object, Method>>> subscribers;
+    private Map<Class<? extends Event>, List<Pair<? extends EventHandler, Method>>> subscribers;
 
     public EventDispatcherWorker() {
         eventsToDispatch = new LinkedBlockingQueue<>();
@@ -46,6 +47,7 @@ public class EventDispatcherWorker extends BackgroundWorker {
     }
 
     public void enqueueEvent(Event event) {
+        event.timestampEvent();
         eventsToDispatch.add(event);
     }
 
@@ -58,8 +60,8 @@ public class EventDispatcherWorker extends BackgroundWorker {
             Event eventToDispatch = eventsToDispatch.remove();
 
             if (subscribers.containsKey(eventToDispatch.getClass())) {
-                List<Pair<Object, Method>> handlers = subscribers.get(eventToDispatch.getClass());
-                for (Pair<Object, Method> handler : handlers) {
+                List<Pair<? extends EventHandler, Method>> handlers = subscribers.get(eventToDispatch.getClass());
+                for (Pair<? extends EventHandler, Method> handler : handlers) {
                     try {
                         handler.getValue().invoke(handler.getKey(), eventToDispatch);
                     } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
@@ -76,7 +78,7 @@ public class EventDispatcherWorker extends BackgroundWorker {
         this.eventsToDispatch = eventsToDispatch;
     }
 
-    public void setSubscribers(Map<Class<? extends Event>, List<Pair<Object, Method>>> subscribers) {
+    public void setSubscribers(Map<Class<? extends Event>, List<Pair<? extends EventHandler, Method>>> subscribers) {
         this.subscribers = subscribers;
     }
 }

@@ -5,11 +5,13 @@
  */
 package smarthomesystem;
 
+import arduino.MicroControllerFactory;
 import banana.Injector;
 import banana.InjectorInterface;
 import banana.exceptions.ClassNotInjectable;
 import banana.exceptions.InterfaceNotImplemented;
 import banana.exceptions.UnresolvableDependency;
+import data.DateTimeService;
 import data.PathProvider;
 import data.SerializationUtils;
 import encoding.EncodingAlgorithm;
@@ -37,15 +39,19 @@ import messaging.MessageDispatcherWorker;
 import messaging.events.EventDispatcher;
 import messaging.events.threading.EventDispatcherWorker;
 import messaging.exceptions.HandlersAlreadyInitializedException;
+import messaging.virtualdevice.VirtualDeviceMessageBrokerFactory;
 import org.reflections.Reflections;
 import org.reflections.scanners.SubTypesScanner;
+import smarthomesystem.repos.MicroControllerRepository;
 import smarthomesystem.ui.ColorPallete;
 import smarthomesystem.ui.ServiceableFrame;
 import smarthomesystem.ui.frames.connection.BluetoothConnectionFrame;
 import smarthomesystem.ui.frames.connection.ConnectionFrame;
 import smarthomesystem.ui.frames.connection.BluetoothConnectingFrame;
 import smarthomesystem.ui.frames.main.IndexFrame;
+import smarthomesystem.ui.frames.main.SettingsFrame;
 import smarthomesystem.ui.services.FrameService;
+import smarthomesystem.ui.services.main.SettingsFrameService;
 import smarthomesystem.ui.services.connection.BluetoothConnectionFrameService;
 import smarthomesystem.ui.services.connection.ConnectionFrameService;
 import smarthomesystem.ui.services.connection.BluetoothConnectingFrameService;
@@ -89,22 +95,25 @@ public class SmartHomeSystem {
             MessageUtils messageUtils = new MessageUtils(new MessageIdentifierGenerator());
             MessageDispatcherWorkerFactory messageDispatcherWorkerFactory = new MessageDispatcherWorkerFactory();
             MessageDispatcherWorker messageDispatcherWorker = messageDispatcherWorkerFactory.createNewInstance();
-            MessageDispatcher messageDispatcher = new MessageDispatcher(messageUtils, messageDispatcherWorker);
             Reflections reflections = new Reflections(
                     getClass().getPackage().getName(),
                     new SubTypesScanner(false)
             );
-
+            MessageDispatcher messageDispatcher = new MessageDispatcher(reflections, messageUtils, messageDispatcherWorker);
             EventDispatcherWorkerFactory eventDispatcherWorkerFactory = new EventDispatcherWorkerFactory();
             EventDispatcherWorker eventDispatcherWorker = eventDispatcherWorkerFactory.createNewInstance();
             EventDispatcher eventDispatcher = new EventDispatcher(reflections, eventDispatcherWorker);
 
             container = new Injector(new HashMap<>(), new HashMap<>(), new ArrayList<>());
             container
+                    .addDependency(VirtualDeviceMessageBrokerFactory.class, VirtualDeviceMessageBrokerFactory.class)
+                    .addDependency(DateTimeService.class, DateTimeService.class)
+                    .addDependency(MicroControllerRepository.class, MicroControllerRepository.class)
                     .addDependency(ColorPallete.class, ColorPallete.class)
                     .addDependency(PathProvider.class, PathProvider.class)
                     .addDependency(ConnectionService.class, ConnectionService.class)
                     .addDependency(SerializationUtils.class, SerializationUtils.class)
+                    .addDependency(Reflections.class, reflections)
                     .addDependency(MessageUtils.class, messageUtils)
                     .addDependency(MessageFactory.class, MessageFactory.class)
                     .addDependency(MessageDispatcherWorkerFactory.class, MessageDispatcherWorkerFactory.class)
@@ -118,7 +127,6 @@ public class SmartHomeSystem {
                     .addDependency(BluetoothOutputWorkerFactory.class, BluetoothOutputWorkerFactory.class)
                     .addDependency(BluetoothModuleApiWrapper.class, BluetoothModuleApiWrapper.class)
                     .addDependency(MessageBroker.class, BluetoothBroker.class)
-                    .addDependency(Reflections.class, reflections)
                     .addDependency(EventDispatcher.class, eventDispatcher)
                     .addDependency(EventDispatcherWorker.class, eventDispatcherWorker)
                     .addDependency(ConnectionFrameService.class, ConnectionFrameService.class)
@@ -128,12 +136,15 @@ public class SmartHomeSystem {
                     .addDependency(BluetoothConnectingFrame.class, BluetoothConnectingFrame.class)
                     .addDependency(BluetoothConnectingFrameService.class, BluetoothConnectingFrameService.class)
                     .addDependency(IndexFrame.class, IndexFrame.class)
-                    .addDependency(IndexFrameService.class, IndexFrameService.class);
+                    .addDependency(IndexFrameService.class, IndexFrameService.class)
+                    .addDependency(SettingsFrame.class, SettingsFrame.class)
+                    .addDependency(SettingsFrameService.class, SettingsFrameService.class)
+                    .addDependency(MicroControllerFactory.class, MicroControllerFactory.class);
 
             container.initialise();
         } catch (InterfaceNotImplemented | ClassNotInjectable | NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException | UnresolvableDependency ex) {
             Logger.getLogger(SmartHomeSystem.class.getName()).log(Level.SEVERE, null, ex);
-            System.exit(0);
+            terminateSmartHomeSystem();
         }
     }
 
@@ -153,7 +164,7 @@ public class SmartHomeSystem {
             threadPoolSupervisor.startThread(eventDispatcherWorker);
         } catch (ThreadNotFoundException | ThreadAlreadyStartedException ex) {
             Logger.getLogger(SmartHomeSystem.class.getName()).log(Level.SEVERE, null, ex);
-            System.exit(0);
+            terminateSmartHomeSystem();
         }
     }
 

@@ -21,7 +21,7 @@ public class ConnectionService {
     ConnectionListener connectionListener;
     RetryConnectionPolicy retryPolicy;
 
-    public void connectTo(final BrokerConfig config, Class<? extends MessageBroker> brokerType) {
+    public void connectTo(final BrokerConfig config) {
         if (retryPolicy == null) {
             retryPolicy = new RetryConnectionPolicy(0);
         }
@@ -31,7 +31,7 @@ public class ConnectionService {
             public void run() {
                 connectionListener.onInit();
 
-                while (!tryToConnect(config, brokerType) && retryPolicy.hasAvailableRetries()) {
+                while (!tryToConnect(config) && retryPolicy.hasAvailableRetries()) {
                     connectionListener.onRetry();
                     retryPolicy.consumeRetryAttempt();
                 }
@@ -59,8 +59,8 @@ public class ConnectionService {
         return retryPolicy;
     }
 
-    private boolean tryToConnect(BrokerConfig config, Class<? extends MessageBroker> brokerType) {
-        MessageBroker messageBroker = container.resolveDependencies(brokerType);
+    private boolean tryToConnect(BrokerConfig config) {
+        MessageBroker messageBroker = container.resolveDependencies(MessageBroker.class);
 
         try {
             messageBroker.initConnection(config);

@@ -12,4 +12,6 @@ package misc;
 public class Misc {
 
     public static final int CLEAR_BUFFER_NR_CONFIRMATION_BYTES = 10;
+    public static final String EMPTY_MAC_ADDRESS = "000000000000";
+    public static final String VIRTUAL_DEVICE_NAME = "VirtualDevice";
 }

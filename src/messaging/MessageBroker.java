@@ -70,7 +70,8 @@ public abstract class MessageBroker<
         outputStream.flush();
         outputStream.close();
 
-        threadPoolSupervisor.terminateAllThreads();
+        threadPoolSupervisor.terminateIOWorkers();
+        threadPoolSupervisor.removeIOWorkers();
     }
 
     @Override

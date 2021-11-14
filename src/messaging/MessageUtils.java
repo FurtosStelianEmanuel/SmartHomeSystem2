@@ -48,16 +48,6 @@ public class MessageUtils {
         return unpack(serializedMessage, c);
     }
 
-    public boolean isUnpackable(byte[] data) {
-        for (byte b : data) {
-            if (messageIdentifierGenerator.identifierExists(b)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
     public ClearOutputBufferCommandResponse getClearOutputBufferCommandResponseFromBadPacket(byte[] badPacket) throws CannotUnpackByteArrayException {
         return new ClearOutputBufferCommandResponse(badPacket);
     }

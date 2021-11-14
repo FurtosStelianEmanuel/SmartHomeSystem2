@@ -14,4 +14,13 @@ public class Response extends Message {
     public Response(byte identifier) {
         super(identifier);
     }
+
+    @Override
+    public String toString() {
+        return String.format("MessageResponse: %s %s", getClass().getName(), serialisedData);
+    }
+
+    public String toString(String messageToInclude) {
+        return String.format("%s --- %s", getClass().getSimpleName(), messageToInclude);
+    }
 }

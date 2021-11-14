@@ -23,6 +23,7 @@ import javax.bluetooth.LocalDevice;
 import javax.bluetooth.RemoteDevice;
 import javax.bluetooth.ServiceRecord;
 import javax.swing.table.DefaultTableModel;
+import misc.Misc;
 import smarthomesystem.ui.frames.connection.BluetoothConnectionFrame;
 import smarthomesystem.ui.services.FrameService;
 
@@ -38,6 +39,7 @@ public class BluetoothConnectionFrameService extends FrameService<BluetoothConne
 
     private final String bluetoothDevicesFileName = "bluetoothDevices.shs";
     private final String selectedDeviceFileName = "selectedDevice.shs";
+    private final boolean LOAD_VIRTUAL_DEVICE = true;
 
     public BluetoothConnectionFrameService(SerializationUtils serializationUtils, PathProvider pathProvider) {
         this.serializationUtils = serializationUtils;
@@ -51,6 +53,8 @@ public class BluetoothConnectionFrameService extends FrameService<BluetoothConne
         try {
             deserializedDevices = serializationUtils.deserialize(Paths.get(serializationUtils.serializationDirectory, bluetoothDevicesFileName).toString());
             deserializedSelectedDevice = serializationUtils.deserialize(Paths.get(serializationUtils.serializationDirectory, selectedDeviceFileName).toString());
+
+            checkVirtualDevice(deserializedDevices);
         } catch (IOException | ClassNotFoundException ex) {
             Logger.getLogger(BluetoothConnectionFrameService.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -81,6 +85,10 @@ public class BluetoothConnectionFrameService extends FrameService<BluetoothConne
             String macAddress = (String) tableContent.getValueAt(i, 0);
             String deviceName = (String) tableContent.getValueAt(i, 1);
 
+            if (macAddress.equals(Misc.EMPTY_MAC_ADDRESS) && deviceName.equals(Misc.VIRTUAL_DEVICE_NAME)) {
+                continue;
+            }
+
             devices.add(new Pair(macAddress, deviceName));
         }
 
@@ -88,6 +96,14 @@ public class BluetoothConnectionFrameService extends FrameService<BluetoothConne
 
         serializationUtils.serialize(devices, Paths.get(pathProvider.getCurrentWorkingDirectory(), "serialized").toString(), bluetoothDevicesFileName);
         serializationUtils.serialize(new Pair((String) tableContent.getValueAt(selectedRow, 0), (String) tableContent.getValueAt(selectedRow, 1)), Paths.get(pathProvider.getCurrentWorkingDirectory(), "serialized").toString(), selectedDeviceFileName);
+    }
+
+    private void checkVirtualDevice(List<Pair<String, String>> deserializedDevices) {
+        if (!LOAD_VIRTUAL_DEVICE) {
+            return;
+        }
+
+        deserializedDevices.add(new Pair(Misc.EMPTY_MAC_ADDRESS, Misc.VIRTUAL_DEVICE_NAME));
     }
 
     private void searchDevices() {

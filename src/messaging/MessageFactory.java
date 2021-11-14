@@ -34,12 +34,14 @@ public class MessageFactory extends Factory<Message> {
     public <K> K createReflectiveInstance(Class<K> classReference) {
         byte identifier = messageUtils.getMessageIdentifierGenerator().getIdentifier(classReference);
         Message message = null;
+        
         try {
             Constructor constructor = classReference.getConstructor(new Class[]{byte.class});
             message = (Message) constructor.newInstance(identifier);
         } catch (NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
             Logger.getLogger(MessageFactory.class.getName()).log(Level.SEVERE, null, ex);
         }
+        
         return (K) message;
     }
 }

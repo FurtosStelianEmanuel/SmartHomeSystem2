@@ -5,19 +5,28 @@
  */
 package messaging;
 
+import banana.InjectorInterface;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import javafx.util.Pair;
 import messaging.commands.MyTestCommand;
+import messaging.commands.MyTestCommand2;
+import messaging.commands.MyTestCommand3;
+import messaging.exceptions.HandlersAlreadyInitializedException;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import org.junit.Test;
 import static org.mockito.Mockito.when;
+import org.reflections.Reflections;
 import smarthomesystem.TestUtils;
 
 /**
@@ -32,13 +41,18 @@ public class MessageDispatcherTest extends TestUtils {
     MessageDispatcherWorker messageDispatcherWorkerMock;
 
     MessageIdentifierGenerator messageIdentifierGeneratorMock;
+    InjectorInterface containerMock;
+    Reflections reflectionsMock;
 
     public MessageDispatcherTest() {
         messageUtilsMock = mock(MessageUtils.class);
         messageDispatcherWorkerMock = mock(MessageDispatcherWorker.class);
         messageIdentifierGeneratorMock = mock(MessageIdentifierGenerator.class);
+        reflectionsMock = mock(Reflections.class);
 
-        messageDispatcher = new MessageDispatcher(messageUtilsMock, messageDispatcherWorkerMock);
+        messageDispatcher = new MessageDispatcher(reflectionsMock, messageUtilsMock, messageDispatcherWorkerMock);
+        containerMock = mock(InjectorInterface.class);
+        smarthomesystem.SmartHomeSystem.container = containerMock;
     }
 
     @Test
@@ -159,6 +173,14 @@ public class MessageDispatcherTest extends TestUtils {
 
         public void handle(MyTestCommand command) {
         }
+
+        public void handle(MyTestCommand2 command2) {
+
+        }
+
+        private void handle(MyTestCommand3 command3) {
+
+        }
     }
 
     @Test
@@ -179,5 +201,51 @@ public class MessageDispatcherTest extends TestUtils {
         messageDispatcher.dispatchMessages();
 
         verify(myCommandHandler).handle(myCommand);
+    }
+
+    @Test
+    public void initHandlers_handlersAlreadyInitialized_exceptionThrown() {
+        HashMap commandHandlers = mock(HashMap.class);
+
+        when(commandHandlers.isEmpty()).thenReturn(false);
+
+        messageDispatcher.setCommandHandlers(commandHandlers);
+
+        try {
+            messageDispatcher.initHandlers();
+            fail(expectedErrorShouldHaveOccured(HandlersAlreadyInitializedException.class));
+        } catch (HandlersAlreadyInitializedException ex) {
+
+        }
+    }
+
+    @Test
+    public void initHandlers_success() throws NoSuchMethodException {
+        Set<Class<? extends CommandHandler>> mockedCommandHandlerDescendants = new HashSet<>();
+        mockedCommandHandlerDescendants.add(MyCommandHandler.class);
+        MyCommandHandler myCommandHandlerMock = new MyCommandHandler();
+
+        when(reflectionsMock.getSubTypesOf(CommandHandler.class)).thenReturn(mockedCommandHandlerDescendants);
+        when(containerMock.resolveDependencies(MyCommandHandler.class)).thenReturn(myCommandHandlerMock);
+
+        try {
+            messageDispatcher.initHandlers();
+        } catch (HandlersAlreadyInitializedException ex) {
+            fail(unexpectedError(ex));
+        } finally {
+            Map<Class<? extends Message>, Pair<CommandHandler, Method>> result = messageDispatcher.getCommandHandlers();
+            assertEquals(2, result.size());
+
+            assertNotNull(result.get(MyTestCommand.class));
+            assertNotNull(result.get(MyTestCommand2.class));
+
+            assertCommandHandler(new Pair(myCommandHandlerMock, MyCommandHandler.class.getMethod("handle", MyTestCommand.class)), result.get(MyTestCommand.class));
+            assertCommandHandler(new Pair(myCommandHandlerMock, MyCommandHandler.class.getMethod("handle", MyTestCommand2.class)), result.get(MyTestCommand2.class));
+        }
+    }
+
+    private void assertCommandHandler(Pair<CommandHandler, Method> expected, Pair<CommandHandler, Method> actual) {
+        assertEquals(expected.getKey(), actual.getKey());
+        assertEquals(expected.getValue(), actual.getValue());
     }
 }

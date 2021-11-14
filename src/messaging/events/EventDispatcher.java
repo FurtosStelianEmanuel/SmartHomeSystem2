@@ -26,14 +26,14 @@ import static smarthomesystem.SmartHomeSystem.container;
 @Injectable
 public class EventDispatcher {
 
-    private final Map<Class<? extends Event>, List<Pair<Object, Method>>> eventSubscribers;
+    private final Map<Class<? extends Event>, List<Pair<? extends EventHandler, Method>>> eventSubscribers;
     private final Reflections reflections;
     private final EventDispatcherWorker eventDispatcherWorker;
 
     public EventDispatcher(Reflections reflections, EventDispatcherWorker eventDispatcherWorker) {
-        eventSubscribers = new HashMap<>();
         this.reflections = reflections;
         this.eventDispatcherWorker = eventDispatcherWorker;
+        eventSubscribers = new HashMap<>();
     }
 
     public void init() {
@@ -45,16 +45,7 @@ public class EventDispatcher {
 
             for (Method method : eventHandlerInstance.getClass().getDeclaredMethods()) {
                 if (Modifier.isPublic(method.getModifiers())) {
-                    Class<Event> eventType = (Class<Event>) method.getParameterTypes()[0];
-                    if (eventSubscribers.containsKey(eventType)) {
-                        eventSubscribers.get(eventType).add(new Pair(eventHandlerInstance, method));
-                    } else {
-                        eventSubscribers.put((Class<Event>) method.getParameterTypes()[0], new ArrayList<Pair<Object, Method>>() {
-                            {
-                                add(new Pair(eventHandlerInstance, method));
-                            }
-                        });
-                    }
+                    processSubscriber(eventHandlerInstance, method);
                 }
             }
         }
@@ -67,7 +58,34 @@ public class EventDispatcher {
         }
     }
 
-    public Map<Class<? extends Event>, List<Pair<Object, Method>>> getEventSubscribers() {
+    public void dispatchEvents(Event... events) {
+        if (events.length == 0) {
+            return;
+        }
+
+        synchronized (eventDispatcherWorker) {
+            for (Event event : events) {
+                eventDispatcherWorker.enqueueEvent(event);
+            }
+
+            eventDispatcherWorker.notify();
+        }
+    }
+
+    public Map<Class<? extends Event>, List<Pair<? extends EventHandler, Method>>> getEventSubscribers() {
         return eventSubscribers;
+    }
+
+    private void processSubscriber(EventHandler eventHandlerInstance, Method method) {
+        Class<Event> eventType = (Class<Event>) method.getParameterTypes()[0];
+        if (eventSubscribers.containsKey(eventType)) {
+            eventSubscribers.get(eventType).add(new Pair(eventHandlerInstance, method));
+        } else {
+            eventSubscribers.put(eventType, new ArrayList<Pair<? extends EventHandler, Method>>() {
+                {
+                    add(new Pair(eventHandlerInstance, method));
+                }
+            });
+        }
     }
 }

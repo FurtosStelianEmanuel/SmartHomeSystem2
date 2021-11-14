@@ -13,7 +13,6 @@ import java.util.logging.Logger;
 import javafx.util.Pair;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.table.DefaultTableModel;
-import smarthomesystem.ui.ColorPallete;
 import smarthomesystem.ui.ServiceableFrame;
 import smarthomesystem.ui.services.connection.BluetoothConnectionFrameService;
 import static smarthomesystem.SmartHomeSystem.container;
@@ -26,15 +25,7 @@ import smarthomesystem.ui.services.connection.BluetoothConnectingFrameService;
 @Injectable
 public class BluetoothConnectionFrame extends ServiceableFrame<BluetoothConnectionFrameService> {
 
-    private final ColorPallete colorPallete;
-
-    /**
-     * Creates new form BluetoothConnectionFrame
-     *
-     * @param colorPallete
-     */
-    public BluetoothConnectionFrame(ColorPallete colorPallete) {
-        this.colorPallete = colorPallete;
+    public BluetoothConnectionFrame() {
         initComponents();
         setRoundCorners();
         jTable1.getSelectionModel().addListSelectionListener((ListSelectionEvent event) -> {
@@ -122,7 +113,12 @@ public class BluetoothConnectionFrame extends ServiceableFrame<BluetoothConnecti
         jPanel2 = new javax.swing.JPanel();
         jButton2 = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
+        jTable1 = new javax.swing.JTable(){
+            @Override
+            public boolean isCellEditable(int row, int column){
+                return false;
+            }
+        };
         jPanel5 = new javax.swing.JPanel();
         jLabel5 = new javax.swing.JLabel();
 
@@ -135,7 +131,6 @@ public class BluetoothConnectionFrame extends ServiceableFrame<BluetoothConnecti
         jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel3.setText("Choose the device that you want to connect to :");
 
-        jButton1.setBackground(colorPallete.getC2());
         jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/smarthomesystem/ui/resources/reload_32x32.png"))); // NOI18N
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -174,7 +169,6 @@ public class BluetoothConnectionFrame extends ServiceableFrame<BluetoothConnecti
         jPanel2.setPreferredSize(new java.awt.Dimension(124, 64));
         jPanel2.setLayout(new java.awt.GridLayout(1, 0));
 
-        jButton2.setBackground(colorPallete.getC2());
         jButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/smarthomesystem/ui/resources/checkmark_32x32.png"))); // NOI18N
         jButton2.setEnabled(false);
         jButton2.addActionListener(new java.awt.event.ActionListener() {

@@ -51,8 +51,8 @@ public class BluetoothConnectionFrameService extends FrameService<BluetoothConne
         Pair<String, String> deserializedSelectedDevice = null;
 
         try {
-            deserializedDevices = serializationUtils.deserialize(Paths.get(serializationUtils.serializationDirectory, bluetoothDevicesFileName).toString());
-            deserializedSelectedDevice = serializationUtils.deserialize(Paths.get(serializationUtils.serializationDirectory, selectedDeviceFileName).toString());
+            deserializedDevices = serializationUtils.deserializeByteData(Paths.get(serializationUtils.serializationDirectory, bluetoothDevicesFileName).toString());
+            deserializedSelectedDevice = serializationUtils.deserializeByteData(Paths.get(serializationUtils.serializationDirectory, selectedDeviceFileName).toString());
 
             checkVirtualDevice(deserializedDevices);
         } catch (IOException | ClassNotFoundException ex) {
@@ -94,8 +94,8 @@ public class BluetoothConnectionFrameService extends FrameService<BluetoothConne
 
         int selectedRow = frame.jTable1.getSelectedRow();
 
-        serializationUtils.serialize(devices, Paths.get(pathProvider.getCurrentWorkingDirectory(), "serialized").toString(), bluetoothDevicesFileName);
-        serializationUtils.serialize(new Pair((String) tableContent.getValueAt(selectedRow, 0), (String) tableContent.getValueAt(selectedRow, 1)), Paths.get(pathProvider.getCurrentWorkingDirectory(), "serialized").toString(), selectedDeviceFileName);
+        serializationUtils.serializeAsByteData(devices, Paths.get(pathProvider.getCurrentWorkingDirectory(), "serialized", bluetoothDevicesFileName));
+        serializationUtils.serializeAsByteData(new Pair((String) tableContent.getValueAt(selectedRow, 0), (String) tableContent.getValueAt(selectedRow, 1)), Paths.get(pathProvider.getCurrentWorkingDirectory(), "serialized", selectedDeviceFileName));
     }
 
     private void checkVirtualDevice(List<Pair<String, String>> deserializedDevices) {

@@ -121,7 +121,7 @@ public class VirtualDeviceMessageBroker<T> extends MessageBroker {
         } else if (data[0] == messageIdentifierGenerator.getIdentifier(MicroControllerQuery.class)) {
             processInput(new byte[]{
                 messageIdentifierGenerator.getIdentifier(MicroControllerQueryResult.class),
-                0,
+                2,
                 0
             });
         }

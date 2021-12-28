@@ -26,13 +26,20 @@ public class BluetoothConnectingFrame extends ServiceableFrame<BluetoothConnecti
      * Creates new form WirelessConnectingForm
      */
     public BluetoothConnectingFrame() {
-        blendOption = new BlendOption(getClass().getResource("/smarthomesystem/ui/resources/connecting-wireless_300x225.gif"), 128, 139);
+        //blendOption = new BlendOption(getClass().getResource("/smarthomesystem/ui/resources/connecting-wireless_300x225.gif"), 128, 139);
+        blendOption = new BlendOption(getClass().getResource("/smarthomesystem/ui/resources/connecting-wireless_300x225.gif"), 5, 10);
         blendListener = new BlendListenerAdapter() {
+            @Override
+            public void onTransitionToSecondGif() {
+                animationListener.onAnimationTimeout(); // don't forget to remove
+            }
+
             @Override
             public void onSecondGifAboutToRestart() {
                 animationListener.onAnimationTimeout();
             }
         };
+        
         initComponents();
     }
 

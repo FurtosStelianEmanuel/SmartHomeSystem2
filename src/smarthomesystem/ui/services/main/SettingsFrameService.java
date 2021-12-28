@@ -6,16 +6,14 @@
 package smarthomesystem.ui.services.main;
 
 import annotations.Injectable;
-import arduino.MicroControllerDetailProjection;
-import java.io.IOException;
-import messaging.MessageBroker;
+import javax.swing.JTabbedPane;
+import javax.swing.event.ChangeEvent;
 import messaging.MessageFactory;
-import messaging.exceptions.PackingNotImplementedException;
-import smarthomesystem.commands.ModulatePulseWidthCommand;
-import smarthomesystem.repos.MicroControllerRepository;
 import smarthomesystem.ui.frames.main.SettingsFrame;
 import smarthomesystem.ui.services.FrameService;
 import static smarthomesystem.SmartHomeSystem.container;
+import smarthomesystem.ui.services.main.settingsframe.MicroControllerSettingsService;
+import smarthomesystem.ui.services.main.settingsframe.RgbSettingsService;
 
 /**
  *
@@ -24,28 +22,37 @@ import static smarthomesystem.SmartHomeSystem.container;
 @Injectable
 public class SettingsFrameService extends FrameService<SettingsFrame> {
 
-    private final MicroControllerRepository microControllerRepository;
-    private final MessageFactory messageFactory;
+    private final RgbSettingsService rgbSettingsService;
+    private final MicroControllerSettingsService microControllerSettingsService;
 
-    public SettingsFrameService(MicroControllerRepository microControllerRepository, MessageFactory messageFactory) {
-        this.microControllerRepository = microControllerRepository;
-        this.messageFactory = messageFactory;
+    public SettingsFrameService() {
+        rgbSettingsService = container.resolveDependencies(RgbSettingsService.class);
+        microControllerSettingsService = container.resolveDependencies(MicroControllerSettingsService.class);
     }
 
     public void frameOpened() {
-        MicroControllerDetailProjection activeMicroController = microControllerRepository.getActiveMicroController();
-        frame.setComboBoxPins(frame.jComboBox1, activeMicroController.pwmPins);
-        frame.setComboBoxPins(frame.jComboBox4, activeMicroController.pwmPins);
-        frame.setComboBoxPins(frame.jComboBox5, activeMicroController.pwmPins);
+        frame.jTabbedPane1.addChangeListener((ChangeEvent e) -> {
+            JTabbedPane tabbedPane = (JTabbedPane) e.getSource();
+            switch (tabbedPane.getSelectedIndex()) {
+                case 0:
+                    rgbSettingsService.tabSelected(frame);
+                    break;
+                case 1:
+                    break;
+                case 2:
+                    microControllerSettingsService.tabSelected(frame);
+                    break;
+            }
+        });
+
+        rgbSettingsService.tabSelected(frame);
     }
 
-    public void testBrightness(String pin, int brightness) throws IOException, PackingNotImplementedException {
-        ModulatePulseWidthCommand modulatePulseWidthCommand = messageFactory.createReflectiveInstance(ModulatePulseWidthCommand.class);
-        MessageBroker messageBroker = container.resolveDependencies(MessageBroker.class);
+    public RgbSettingsService getRgbSettingsService() {
+        return rgbSettingsService;
+    }
 
-        modulatePulseWidthCommand.modulation = brightness;
-        modulatePulseWidthCommand.pin = Integer.valueOf(pin);
-
-        messageBroker.send(modulatePulseWidthCommand);
+    public MicroControllerSettingsService getMicroControllerSettingsService() {
+        return microControllerSettingsService;
     }
 }

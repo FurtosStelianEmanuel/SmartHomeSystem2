@@ -3,16 +3,11 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package smarthomesystem.repos.dao;
-
-import java.io.Serializable;
-import java.util.UUID;
+package smarthomesystem.ui.frames.main.settingsframe;
 
 /**
  *
  * @author Manel
  */
-public class PersistedComponent {
-
-    public UUID id;
+public interface MicroControllerFrameInterface {
 }

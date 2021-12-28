@@ -3,16 +3,20 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package smarthomesystem.repos.dao;
+package smarthomesystem.ledstrips;
 
-import java.io.Serializable;
 import java.util.UUID;
 
 /**
  *
  * @author Manel
  */
-public class PersistedComponent {
+public class RgbStripDetailProjection {
 
+    public int sequence;
+    public int redPin, greenPin, bluePin;
     public UUID id;
+    public String description;
+    public boolean isTemporary;
+    public boolean isSelected;
 }

@@ -14,6 +14,7 @@ import banana.exceptions.UnresolvableDependency;
 import data.DateTimeService;
 import data.PathProvider;
 import data.SerializationUtils;
+import data.ShsSerializer;
 import encoding.EncodingAlgorithm;
 import encoding.EncodingUtils;
 import encoding.algorithms.HammingEncoder;
@@ -43,18 +44,14 @@ import messaging.virtualdevice.VirtualDeviceMessageBrokerFactory;
 import org.reflections.Reflections;
 import org.reflections.scanners.SubTypesScanner;
 import smarthomesystem.repos.MicroControllerRepository;
+import smarthomesystem.repos.RgbStripRepository;
 import smarthomesystem.ui.ColorPallete;
 import smarthomesystem.ui.ServiceableFrame;
-import smarthomesystem.ui.frames.connection.BluetoothConnectionFrame;
-import smarthomesystem.ui.frames.connection.ConnectionFrame;
-import smarthomesystem.ui.frames.connection.BluetoothConnectingFrame;
-import smarthomesystem.ui.frames.main.IndexFrame;
-import smarthomesystem.ui.frames.main.SettingsFrame;
+import smarthomesystem.ui.frames.connection.*;
+import smarthomesystem.ui.frames.main.*;
 import smarthomesystem.ui.services.FrameService;
 import smarthomesystem.ui.services.main.SettingsFrameService;
-import smarthomesystem.ui.services.connection.BluetoothConnectionFrameService;
-import smarthomesystem.ui.services.connection.ConnectionFrameService;
-import smarthomesystem.ui.services.connection.BluetoothConnectingFrameService;
+import smarthomesystem.ui.services.connection.*;
 import smarthomesystem.ui.services.main.IndexFrameService;
 import threading.ThreadPoolSupervisor;
 import threading.exceptions.ThreadAlreadyStartedException;
@@ -113,6 +110,8 @@ public class SmartHomeSystem {
                     .addDependency(PathProvider.class, PathProvider.class)
                     .addDependency(ConnectionService.class, ConnectionService.class)
                     .addDependency(SerializationUtils.class, SerializationUtils.class)
+                    .addDependency(ShsSerializer.class, ShsSerializer.class)
+                    .addDependency(RgbStripRepository.class, RgbStripRepository.class)
                     .addDependency(Reflections.class, reflections)
                     .addDependency(MessageUtils.class, messageUtils)
                     .addDependency(MessageFactory.class, MessageFactory.class)

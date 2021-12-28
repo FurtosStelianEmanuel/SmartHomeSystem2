@@ -60,6 +60,21 @@ public class MicroControllerRepository extends Repository<MicroControllerDao> {
         return mapToMicroControllerDetailProjection(readRecord(mc -> mc.isInUse));
     }
 
+    @Override
+    protected void commitRecordsToStorage() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public Object getSerializedFormat() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    protected void loadRecordsFromStorage() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
     private MicroControllerDao mapToMicroControllerDao(MicroController microController) {
         return new MicroControllerDao() {
             {

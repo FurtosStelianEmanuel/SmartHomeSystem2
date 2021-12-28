@@ -27,10 +27,10 @@ public class ColorPallete {
 
     private final EventDispatcher eventDispatcher;
 
-    public Color primaryColor = new Color(21, 21, 21);
-    Color secondaryColor = new Color(48, 27, 63);
-    Color thirdColor = new Color(60, 65, 92);
-    Color fourthColor = new Color(180, 165, 165);
+    private Color primaryColor = new Color(21, 21, 21);
+    private Color secondaryColor = new Color(48, 27, 63);
+    private Color thirdColor = new Color(60, 65, 92);
+    private Color fourthColor = new Color(180, 165, 165);
 
     public ColorPallete(EventDispatcher eventDispatcher) {
         this.eventDispatcher = eventDispatcher;
@@ -77,6 +77,8 @@ public class ColorPallete {
                     ret.put("TextArea.background", secondaryColor);
                     ret.put("TabbedPane.background", secondaryColor);
                     ret.put("Button.background", secondaryColor);
+                    ret.put("ComboBox.background", primaryColor);
+                    ret.put("ToggleButton.background", secondaryColor);
                     return ret;
                 }
             });

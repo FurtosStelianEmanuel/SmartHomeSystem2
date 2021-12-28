@@ -8,13 +8,13 @@ package data;
 import annotations.Injectable;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.nio.file.Paths;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.io.PrintWriter;
+import java.nio.file.Path;
 
 /**
  *
@@ -24,29 +24,28 @@ import java.util.logging.Logger;
 public class SerializationUtils {
 
     public final String serializationDirectory = "serialized";
-    
-    public void serialize(Object obj, String directoryPath, String fileName) throws IOException {
-        File directory = new File(directoryPath);
-        if (!directory.exists()) {
-            boolean directoryCreated = directory.mkdir();
-            Logger.getLogger(SerializationUtils.class.getName()).log(Level.INFO, directoryCreated + "",
-                    directoryCreated ? "A trebuit sa creez un nou folder " : "Nu am putut un nou folder");
-        }
 
-        File serializationTarget = Paths.get(directoryPath, fileName).toFile();
-        
+    public void serializeAsByteData(Object object, Path pathToStore) throws IOException {
+        File serializationTarget = pathToStore.toFile();
+
         try (FileOutputStream file = new FileOutputStream(serializationTarget); ObjectOutputStream out = new ObjectOutputStream(file)) {
-            out.writeObject(obj);
+            out.writeObject(object);
         }
     }
 
-    public <T> T deserialize(String filePath) throws IOException, ClassNotFoundException {
+    public <T> T deserializeByteData(String filePath) throws IOException, ClassNotFoundException {
         T object1;
-        
+
         try (FileInputStream file = new FileInputStream(filePath); ObjectInputStream in = new ObjectInputStream(file)) {
             object1 = (T) in.readObject();
         }
 
         return object1;
+    }
+
+    public void serializeAsJson(String serializedObject, Path pathToStore) throws FileNotFoundException {
+        try (PrintWriter out = new PrintWriter(pathToStore.toFile())) {
+            out.println(serializedObject);
+        }
     }
 }

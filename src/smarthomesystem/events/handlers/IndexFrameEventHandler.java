@@ -37,10 +37,8 @@ public class IndexFrameEventHandler extends EventHandler {
         setSerialSettings.bufferSize = 8;
         setSerialSettings.timeout = 5;
 
-        System.out.println("venitam si eu");
-
-        MessageBroker messageBroker = container.resolveDependencies(MessageBroker.class);
         try {
+            MessageBroker messageBroker = container.resolveDependencies(MessageBroker.class);
             messageBroker.send(setSerialSettings, new ResponseListener(new ResponseCallback<SetSerialSettingsCommandResponse>(SetSerialSettingsCommandResponse.class) {
                 @Override
                 public void onResponse(SetSerialSettingsCommandResponse response) {

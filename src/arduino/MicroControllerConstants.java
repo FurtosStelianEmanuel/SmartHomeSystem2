@@ -3,16 +3,14 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package smarthomesystem.repos.dao;
-
-import java.io.Serializable;
-import java.util.UUID;
+package arduino;
 
 /**
  *
  * @author Manel
  */
-public class PersistedComponent {
+public class MicroControllerConstants {
 
-    public UUID id;
+    public static final int GIVE_RESPONSE_IDENTIFIER = 0;
+    public static final int GIVE_NO_RESPONSE_IDENTIFIER = 1;
 }

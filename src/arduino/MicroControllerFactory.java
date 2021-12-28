@@ -20,9 +20,11 @@ public class MicroControllerFactory {
 
     public MicroControllerFactory(MicroControllerRepository microControllerRepository) {
         this.microControllerRepository = microControllerRepository;
+
         microControllerRepository.addMicroControllers(new MicroController[]{
             unknownMicroController,
-            arduinoUno
+            arduinoUno,
+            virtualArduinoUno
         });
     }
 
@@ -31,7 +33,7 @@ public class MicroControllerFactory {
             name = "Unknown microcontroller, using settings from Arduino Uno";
             noOfAnalogInputPins = 5;
             noOfDigitalIOPins = 13;
-            pwmPins = new int[]{3, 5, 6, 10, 11};
+            pwmPins = new int[]{3, 5, 6, 9, 10, 11};
             rxPins = new int[]{0};
             txPins = new int[]{1};
             microControllerSignature = 0;
@@ -44,11 +46,24 @@ public class MicroControllerFactory {
             name = "Arduino Uno";
             noOfAnalogInputPins = 5;
             noOfDigitalIOPins = 13;
-            pwmPins = new int[]{3, 5, 6, 10, 11};
+            pwmPins = new int[]{3, 5, 6, 9, 10, 11};
             rxPins = new int[]{0};
             txPins = new int[]{1};
             microControllerSignature = 1;
             id = UUID.fromString("ecb35e8c-32fc-4162-8144-5607cc22c9ca");
+        }
+    };
+
+    private final MicroController virtualArduinoUno = new MicroController() {
+        {
+            name = "Virtual Arduino Uno";
+            noOfAnalogInputPins = 5;
+            noOfDigitalIOPins = 13;
+            pwmPins = new int[]{3, 5, 6, 9, 10, 11};
+            rxPins = new int[]{0};
+            txPins = new int[]{1};
+            microControllerSignature = 2;
+            id = UUID.fromString("be1a21a1-602e-4d72-a4ff-52934e7595ff");
         }
     };
 }

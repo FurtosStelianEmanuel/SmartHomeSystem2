@@ -5,8 +5,11 @@
  */
 package persistance;
 
+import bananaconvert.marshaler.exception.SerializationException;
+import java.io.FileNotFoundException;
 import java.util.UUID;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 import smarthomesystem.repos.dao.PersistedComponent;
 
 /**
@@ -16,9 +19,11 @@ import smarthomesystem.repos.dao.PersistedComponent;
  */
 public abstract class Repository<K extends PersistedComponent> extends InMemoryDataset<K> {
 
-    public Repository() {
+    public abstract Object getSerializedFormat();
 
-    }
+    protected abstract void commitRecordsToStorage() throws FileNotFoundException, SerializationException;
+
+    protected abstract void loadRecordsFromStorage();
 
     protected K readRecord(UUID pk) {
         return records.stream().filter(r -> r.id == pk).findAny().orElse(null);
@@ -28,12 +33,20 @@ public abstract class Repository<K extends PersistedComponent> extends InMemoryD
         return records.stream().filter(predicate).findAny().orElse(null);
     }
 
+    protected Stream<K> readRecords() {
+        return records.stream();
+    }
+
     protected void createRecord(K record) {
         records.add(record);
     }
 
     protected void updateRecord(K record) {
         records.set(getIndexOfRecord(record), record);
+    }
+
+    protected void deleteRecords(Predicate<? super K> predicate) {
+        records.removeIf(predicate);
     }
 
     protected int[] parseIntegerArray(String s) {

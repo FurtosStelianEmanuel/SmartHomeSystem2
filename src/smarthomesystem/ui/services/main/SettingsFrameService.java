@@ -8,7 +8,6 @@ package smarthomesystem.ui.services.main;
 import annotations.Injectable;
 import javax.swing.JTabbedPane;
 import javax.swing.event.ChangeEvent;
-import messaging.MessageFactory;
 import smarthomesystem.ui.frames.main.SettingsFrame;
 import smarthomesystem.ui.services.FrameService;
 import static smarthomesystem.SmartHomeSystem.container;

@@ -64,7 +64,7 @@ public class SettingsFrame extends ServiceableFrame<SettingsFrameService> implem
         jComboBox1.setSelectedItem((Object) selectedStrip.redPin);
         jComboBox4.setSelectedItem((Object) selectedStrip.greenPin);
         jComboBox5.setSelectedItem((Object) selectedStrip.bluePin);
-        jCheckBox1.setSelected(selectedStrip.isSelected);
+        jCheckBox1.setSelected(selectedStrip.isPrimary);
     }
 
     @Override

@@ -19,6 +19,7 @@ import smarthomesystem.events.models.*;
 import static smarthomesystem.SmartHomeSystem.container;
 import smarthomesystem.commands.responses.SetSerialSettingsCommandResponse;
 import smarthomesystem.ui.frames.main.IndexFrame;
+import smarthomesystem.animation.AnimationConfig;
 
 /**
  *
@@ -51,7 +52,8 @@ public class IndexFrameEventHandler extends EventHandler {
     }
 
     public void handle(IndexFrameClosed event) {
-        System.out.println("s a inchis");
+        AnimationConfig recursiveTreeAnimation = (AnimationConfig) container.resolveDependencies(IndexFrame.class).recursiveTree;
+        recursiveTreeAnimation.save();
     }
 
     public void handle(BluetoothConnectionReady event) {

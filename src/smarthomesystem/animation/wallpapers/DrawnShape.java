@@ -3,15 +3,15 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package smarthomesystem.repos.dao;
+package smarthomesystem.animation.wallpapers;
 
-import java.util.UUID;
+import java.awt.Shape;
 
 /**
  *
  * @author Manel
  */
-public class PersistedComponent {
+public interface DrawnShape {
 
-    public UUID id;
+    Shape getShape();
 }

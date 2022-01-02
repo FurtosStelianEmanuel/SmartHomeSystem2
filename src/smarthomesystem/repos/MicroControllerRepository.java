@@ -66,7 +66,7 @@ public class MicroControllerRepository extends Repository<MicroControllerDao> {
     }
 
     @Override
-    public Object getSerializedFormat() {
+    public Object mapToSerializedFormat() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 

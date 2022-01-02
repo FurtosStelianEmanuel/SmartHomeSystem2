@@ -48,6 +48,7 @@ public class MessageIdentifierGenerator {
             put(ModulatePulseWidthCommandResponse.class, getNext());
             put(MicroControllerQuery.class, getNext());
             put(MicroControllerQueryResult.class, getNext());
+            put(SetRgbStripColorCommand.class, getNext());
         }
     };
     private final Map<Byte, Class> reversedIdentifiers;

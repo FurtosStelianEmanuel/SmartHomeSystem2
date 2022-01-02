@@ -11,15 +11,17 @@ import java.util.UUID;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 import smarthomesystem.repos.dao.PersistedComponent;
+import data.SerializationMapper;
 
 /**
  *
  * @author Manel
  * @param <K>
  */
-public abstract class Repository<K extends PersistedComponent> extends InMemoryDataset<K> {
+public abstract class Repository<K extends PersistedComponent> extends InMemoryDataset<K> implements SerializationMapper {
 
-    public abstract Object getSerializedFormat();
+    @Override
+    public abstract Object mapToSerializedFormat();
 
     protected abstract void commitRecordsToStorage() throws FileNotFoundException, SerializationException;
 

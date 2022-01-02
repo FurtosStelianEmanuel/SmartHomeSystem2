@@ -3,20 +3,20 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package smarthomesystem.ledstrips;
+package smarthomesystem.commands;
 
-import java.util.UUID;
+import messaging.Command;
 
 /**
  *
  * @author Manel
  */
-public class RgbStripDetailProjection {
+public class SetRgbStripColorCommand extends Command {
 
-    public int sequence;
+    public int red, green, blue;
     public int redPin, greenPin, bluePin;
-    public UUID id;
-    public String description;
-    public boolean isTemporary;
-    public boolean isPrimary;
+
+    public SetRgbStripColorCommand(byte identifier) {
+        super(identifier);
+    }
 }

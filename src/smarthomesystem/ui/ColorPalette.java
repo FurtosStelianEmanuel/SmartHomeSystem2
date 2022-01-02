@@ -23,16 +23,16 @@ import messaging.events.ColorPalleteChanged;
  * @author Manel
  */
 @Injectable
-public class ColorPallete {
+public class ColorPalette {
 
     private final EventDispatcher eventDispatcher;
 
-    private Color primaryColor = new Color(21, 21, 21);
+    public static Color primaryColor = new Color(21, 21, 21);
     private Color secondaryColor = new Color(48, 27, 63);
     private Color thirdColor = new Color(60, 65, 92);
     private Color fourthColor = new Color(180, 165, 165);
 
-    public ColorPallete(EventDispatcher eventDispatcher) {
+    public ColorPalette(EventDispatcher eventDispatcher) {
         this.eventDispatcher = eventDispatcher;
         setUIColorPallete();
     }
@@ -40,10 +40,10 @@ public class ColorPallete {
     public void set(Color primaryColor, Color secondaryColor, Color thirdColor, Color fourthColor) {
         ColorPalleteChanged event = new ColorPalleteChanged() {
             {
-                setOldPrimaryColor(ColorPallete.this.primaryColor);
-                setOldSecondaryColor(ColorPallete.this.secondaryColor);
-                setOldThirdColor(ColorPallete.this.thirdColor);
-                setOldFourthColor(ColorPallete.this.fourthColor);
+                setOldPrimaryColor(ColorPalette.this.primaryColor);
+                setOldSecondaryColor(ColorPalette.this.secondaryColor);
+                setOldThirdColor(ColorPalette.this.thirdColor);
+                setOldFourthColor(ColorPalette.this.fourthColor);
 
                 setNewPrimaryColor(primaryColor);
                 setNewSecondaryColor(secondaryColor);

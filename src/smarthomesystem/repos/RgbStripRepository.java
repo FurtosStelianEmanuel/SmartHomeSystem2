@@ -8,7 +8,7 @@ package smarthomesystem.repos;
 import annotations.Injectable;
 import bananaconvert.marshaler.exception.DeserializationException;
 import bananaconvert.marshaler.exception.SerializationException;
-import data.RgbStripSerializedFileFormat;
+import smarthomesystem.repos.dao.models.RgbStripSerializedFileFormat;
 import data.ShsSerializer;
 import java.io.FileNotFoundException;
 import java.util.UUID;
@@ -38,7 +38,7 @@ public class RgbStripRepository extends Repository<RgbStripDao> {
     }
 
     @Override
-    public RgbStripSerializedFileFormat getSerializedFormat() {
+    public RgbStripSerializedFileFormat mapToSerializedFormat() {
         return new RgbStripSerializedFileFormat(records);
     }
 
@@ -100,7 +100,7 @@ public class RgbStripRepository extends Repository<RgbStripDao> {
                 sequence = rgbStripDao.sequence;
                 description = rgbStripDao.description;
                 isTemporary = rgbStripDao.isTemporary;
-                isSelected = rgbStripDao.isSelected;
+                isPrimary = rgbStripDao.isSelected;
             }
         };
     }
@@ -115,7 +115,7 @@ public class RgbStripRepository extends Repository<RgbStripDao> {
                 sequence = rgbStripDetailProjection.sequence;
                 description = rgbStripDetailProjection.description;
                 isTemporary = rgbStripDetailProjection.isTemporary;
-                isSelected = rgbStripDetailProjection.isSelected;
+                isSelected = rgbStripDetailProjection.isPrimary;
             }
         };
     }

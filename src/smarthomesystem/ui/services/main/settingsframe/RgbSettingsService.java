@@ -9,8 +9,6 @@ import arduino.MicroControllerDetailProjection;
 import bananaconvert.marshaler.exception.SerializationException;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import messaging.MessageBroker;
 import messaging.MessageFactory;
@@ -173,7 +171,7 @@ public class RgbSettingsService {
         strip.redPin = Integer.parseInt(frame.jComboBox1.getSelectedItem().toString());
         strip.greenPin = Integer.parseInt(frame.jComboBox4.getSelectedItem().toString());
         strip.bluePin = Integer.parseInt(frame.jComboBox5.getSelectedItem().toString());
-        strip.isSelected = frame.jCheckBox1.isSelected();
+        strip.isPrimary = frame.jCheckBox1.isSelected();
 
         return strip;
     }

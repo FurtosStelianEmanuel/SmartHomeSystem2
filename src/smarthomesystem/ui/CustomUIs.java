@@ -30,15 +30,15 @@ public class CustomUIs {
         private static final int TRACK_ARC = 12;
         private static final Dimension THUMB_SIZE = new Dimension(12, 12);
         private final RoundRectangle2D.Float trackShape = new RoundRectangle2D.Float();
-        private final ColorPallete colorPallete;
+        private final ColorPalette colorPalette;
         private final Color trackBackground;
         private final Color shadow;
 
         public CustomSliderUI(final JSlider b) {
             super(b);
-            this.colorPallete = container.resolveDependencies(ColorPallete.class);
-            trackBackground = colorPallete.getThirdColor();
-            shadow = colorPallete.getPrimaryColor();
+            this.colorPalette = container.resolveDependencies(ColorPalette.class);
+            trackBackground = colorPalette.getThirdColor();
+            shadow = colorPalette.getPrimaryColor();
         }
 
         @Override
@@ -121,14 +121,14 @@ public class CustomUIs {
                 }
             }
 
-            g2.setColor(colorPallete.getSecondaryColor());
+            g2.setColor(colorPalette.getSecondaryColor());
             g2.fill(trackShape);
             g2.setClip(clip);
         }
 
         @Override
         public void paintThumb(final Graphics g) {
-            g.setColor(colorPallete.getFourthColor());
+            g.setColor(colorPalette.getFourthColor());
             g.fillOval(thumbRect.x, thumbRect.y, thumbRect.width, thumbRect.height);
         }
 

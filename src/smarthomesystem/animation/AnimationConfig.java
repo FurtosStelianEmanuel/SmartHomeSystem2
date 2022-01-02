@@ -3,15 +3,15 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package smarthomesystem.repos.dao;
+package smarthomesystem.animation;
 
-import java.util.UUID;
+import data.SerializationMapper;
 
 /**
  *
  * @author Manel
  */
-public class PersistedComponent {
+public interface AnimationConfig extends SerializationMapper {
 
-    public UUID id;
+    void save();
 }

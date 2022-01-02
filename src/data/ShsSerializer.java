@@ -39,7 +39,7 @@ public class ShsSerializer {
     public <K extends Repository> void updateRepository(K repository) throws FileNotFoundException, SerializationException {
         checkSerializationDirectory();
 
-        String serializedToJson = bananaConvert.serializeToJson(repository.getSerializedFormat());
+        String serializedToJson = bananaConvert.serializeToJson(repository.mapToSerializedFormat());
 
         serializationUtils.serializeAsJson(serializedToJson, getPathToRepository(repository));
     }
@@ -47,7 +47,7 @@ public class ShsSerializer {
     public <K extends Repository, T> T loadRepository(K repository) throws FileNotFoundException, DeserializationException {
         checkSerializationDirectory();
 
-        return (T) bananaConvert.deserializeJson(getPathToRepository(repository), repository.getSerializedFormat().getClass());
+        return (T) bananaConvert.deserializeJson(getPathToRepository(repository), repository.mapToSerializedFormat().getClass());
     }
 
     public Path getSerializationPath() {

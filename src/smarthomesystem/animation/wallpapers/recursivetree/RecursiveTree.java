@@ -26,7 +26,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -107,12 +106,49 @@ public class RecursiveTree extends Wallpaper implements RgbColorSender, Animatio
             public void mouseDragged(MouseEvent me) {
                 if (SwingUtilities.isRightMouseButton(me)) {
                     changeBranchAngle(me);
+                } else if (SwingUtilities.isLeftMouseButton(me)) {
+                    sendDraggedLeafColor(me);
                 }
             }
 
             @Override
             public void mouseMoved(MouseEvent me) {
+                boolean leafHovered = checkLeavesForMouseInteraction(me);
+
+                if (leafHovered) {
+                    setCursor(new Cursor(Cursor.HAND_CURSOR));
+                } else {
+                    setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+                }
+            }
+
+            private void sendDraggedLeafColor(MouseEvent me) {
+                if (!SwingUtilities.isLeftMouseButton(me)) {
+                    return;
+                }
+
+                checkLeavesForMouseInteraction(me);
+
+                List<Leaf> hoveredLeaves = leaves.stream().filter(l -> l.isHovered() && l.isColored()).collect(Collectors.toList());
+
+                if (hoveredLeaves.isEmpty() || hoveredLeaves.size() > 1) {
+                    return;
+                }
+
+                Leaf hoveredLeaf = hoveredLeaves.stream().findFirst().orElse(null);
+                if (!hoveredLeaf.isColored()) {
+                    return;
+                }
+
+                if (!hoveredLeaf.isTouched()) {
+                    hoveredLeaf.touch();
+                    sendColor(hoveredLeaf.getColor());
+                }
+            }
+
+            private boolean checkLeavesForMouseInteraction(MouseEvent me) {
                 boolean leafHovered = false;
+
                 for (Leaf leaf : leaves) {
                     leaf.checkIfHovered(me);
 
@@ -121,13 +157,7 @@ public class RecursiveTree extends Wallpaper implements RgbColorSender, Animatio
                     }
                 }
 
-                if (leafHovered) {
-                    setCursor(new Cursor(Cursor.HAND_CURSOR));
-                } else {
-                    setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-                }
-
-                repaint();
+                return leafHovered;
             }
         });
 
@@ -165,7 +195,7 @@ public class RecursiveTree extends Wallpaper implements RgbColorSender, Animatio
                 Leaf hoveredLeaf = hoveredLeaves.stream().findFirst().orElse(null);
 
                 if (hoveredLeaf.isColored()) {
-                    send(hoveredLeaf.getColor());
+                    sendColor(hoveredLeaf.getColor());
                     return;
                 }
 
@@ -196,7 +226,6 @@ public class RecursiveTree extends Wallpaper implements RgbColorSender, Animatio
         },
         new Layer() {
             Stroke stroke = new BasicStroke(2f);
-            Random random = new Random();
 
             @Override
             public boolean shouldShow() {
@@ -218,12 +247,12 @@ public class RecursiveTree extends Wallpaper implements RgbColorSender, Animatio
                 for (Leaf leaf : leaves) {
                     Shape leafShape = leaf.getShape();
 
-                    if (leaf.isColored()) {
-                        painter.setColor(leaf.getColor());
-                        painter.fill(leafShape);
+                    if (!leaf.isColored()) {
+                        continue;
                     }
 
-                    painter.setColor(Color.white);
+                    painter.setColor(leaf.getColor());
+                    painter.fill(leafShape);
                     painter.draw(leafShape);
                 }
             }
@@ -263,7 +292,7 @@ public class RecursiveTree extends Wallpaper implements RgbColorSender, Animatio
     }
 
     @Override
-    public void send(Color color) {
+    public void sendColor(Color color) {
         MessageBroker messageBroker = container.resolveDependencies(MessageBroker.class);
         SetRgbStripColorCommand setRgbStripColorCommand = messageFactory.createReflectiveInstance(SetRgbStripColorCommand.class);
 

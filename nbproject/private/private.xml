@@ -3,21 +3,8 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/Users/Manel/Documents/NetBeansProjects/SmartHomeSystem2/src/persistance/Repository.java</file>
             <file>file:/C:/Users/Manel/Documents/NetBeansProjects/SmartHomeSystem2/src/smarthomesystem/animation/wallpapers/recursivetree/RecursiveTree.java</file>
-            <file>file:/C:/Users/Manel/Documents/NetBeansProjects/SmartHomeSystem2/src/smarthomesystem/repos/MicroControllerRepository.java</file>
             <file>file:/C:/Users/Manel/Documents/NetBeansProjects/SmartHomeSystem2/src/smarthomesystem/animation/wallpapers/recursivetree/Leaf.java</file>
-            <file>file:/C:/Users/Manel/Documents/NetBeansProjects/SmartHomeSystem2/src/smarthomesystem/animation/wallpapers/recursivetree/Branch.java</file>
-            <file>file:/C:/Users/Manel/Documents/NetBeansProjects/SmartHomeSystem2/src/smarthomesystem/ui/frames/main/IndexFrame.java</file>
-            <file>file:/C:/Users/Manel/Documents/NetBeansProjects/SmartHomeSystem2/src/data/SerializableConfiguration.java</file>
-            <file>file:/C:/Users/Manel/Documents/NetBeansProjects/SmartHomeSystem2/src/smarthomesystem/animation/wallpapers/recursivetree/RecursiveTreeSerializedFormat.java</file>
-            <file>file:/C:/Users/Manel/Documents/NetBeansProjects/SmartHomeSystem2/src/data/SerializationMapper.java</file>
-            <file>file:/C:/Users/Manel/Documents/NetBeansProjects/SmartHomeSystem2/src/data/ShsSerializer.java</file>
-            <file>file:/C:/Users/Manel/Documents/NetBeansProjects/SmartHomeSystem2/src/data/SerializationUtils.java</file>
-            <file>file:/C:/Users/Manel/Documents/NetBeansProjects/SmartHomeSystem2/src/smarthomesystem/animation/wallpapers/recursivetree/SerializedLeaf.java</file>
-            <file>file:/C:/Users/Manel/Documents/NetBeansProjects/SmartHomeSystem2/src/misc/Misc.java</file>
-            <file>file:/C:/Users/Manel/Documents/NetBeansProjects/SmartHomeSystem2/src/smarthomesystem/events/handlers/IndexFrameEventHandler.java</file>
-            <file>file:/C:/Users/Manel/Documents/NetBeansProjects/SmartHomeSystem2/src/smarthomesystem/events/models/IndexFrameClosed.java</file>
         </group>
     </open-files>
 </project-private>

@@ -21,7 +21,8 @@ public class Leaf implements DrawnShape {
     private final Vector anchorPoint;
     private final double diameter;
     private Color color;
-    private boolean isHovered;
+    private boolean hovered;
+    private boolean touched;
 
     public Leaf(Branch rootBranch, double diameter) {
         this.diameter = diameter;
@@ -50,11 +51,23 @@ public class Leaf implements DrawnShape {
     }
 
     public void checkIfHovered(MouseEvent me) {
-        isHovered = isHovered(me);
+        hovered = isHovered(me);
+
+        if (!hovered) {
+            touched = false;
+        }
     }
 
     public boolean isHovered() {
-        return isHovered;
+        return hovered;
+    }
+
+    public void touch() {
+        touched = true;
+    }
+
+    public boolean isTouched() {
+        return touched;
     }
 
     private boolean isHovered(MouseEvent me) {

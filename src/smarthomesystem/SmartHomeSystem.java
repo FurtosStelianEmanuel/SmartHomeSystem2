@@ -13,8 +13,7 @@ import banana.exceptions.InterfaceNotImplemented;
 import banana.exceptions.UnresolvableDependency;
 import data.DateTimeService;
 import data.PathProvider;
-import data.SerializationUtils;
-import data.ShsSerializer;
+import data.Serializer;
 import encoding.EncodingAlgorithm;
 import encoding.EncodingUtils;
 import encoding.algorithms.HammingEncoder;
@@ -109,8 +108,7 @@ public class SmartHomeSystem {
                     .addDependency(ColorPalette.class, ColorPalette.class)
                     .addDependency(PathProvider.class, PathProvider.class)
                     .addDependency(ConnectionService.class, ConnectionService.class)
-                    .addDependency(SerializationUtils.class, SerializationUtils.class)
-                    .addDependency(ShsSerializer.class, ShsSerializer.class)
+                    .addDependency(Serializer.class, Serializer.class)
                     .addDependency(RgbStripRepository.class, RgbStripRepository.class)
                     .addDependency(Reflections.class, reflections)
                     .addDependency(MessageUtils.class, messageUtils)

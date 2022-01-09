@@ -7,8 +7,7 @@ package smarthomesystem.animation.wallpapers.recursivetree;
 
 import bananaconvert.marshaler.exception.DeserializationException;
 import bananaconvert.marshaler.exception.SerializationException;
-import data.SerializationUtils;
-import data.ShsSerializer;
+import data.Serializer;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Cursor;
@@ -62,8 +61,7 @@ public class RecursiveTree extends Wallpaper implements RgbColorSender, Animatio
     private boolean showTree = true;
 
     private final Map<Integer, Color> leavesColors;
-    private final SerializationUtils serializationUtils;
-    private final ShsSerializer shsSerializer;
+    private final Serializer shsSerializer;
     private final Path serializationPath;
     private final MessageFactory messageFactory;
     private final RgbStripRepository rgbStripRepository;
@@ -72,8 +70,7 @@ public class RecursiveTree extends Wallpaper implements RgbColorSender, Animatio
         tree = new ArrayList<>();
         leaves = new ArrayList<>();
         leavesColors = new HashMap<>();
-        serializationUtils = container != null ? container.resolveDependencies(SerializationUtils.class) : null;
-        shsSerializer = container != null ? container.resolveDependencies(ShsSerializer.class) : null;
+        shsSerializer = container != null ? container.resolveDependencies(Serializer.class) : null;
         serializationPath = shsSerializer != null ? Paths.get(shsSerializer.getSerializationPath().toString(), "recursiveTree.json") : null;
         messageFactory = container != null ? container.resolveDependencies(MessageFactory.class) : null;
         rgbStripRepository = container != null ? container.resolveDependencies(RgbStripRepository.class) : null;
@@ -332,9 +329,7 @@ public class RecursiveTree extends Wallpaper implements RgbColorSender, Animatio
     @Override
     public void save() {
         try {
-            serializationUtils.serializeAsJson(shsSerializer.getBananaConvert().serializeToJson(mapToSerializedFormat()),
-                    serializationPath
-            );
+            shsSerializer.serializeAsJson(shsSerializer.getBananaConvert().serializeToJson(mapToSerializedFormat()), serializationPath);
         } catch (FileNotFoundException | SerializationException ex) {
             Logger.getLogger(RecursiveTree.class.getName()).log(Level.SEVERE, null, ex);
         }

@@ -9,7 +9,7 @@ import annotations.Injectable;
 import bananaconvert.marshaler.exception.DeserializationException;
 import bananaconvert.marshaler.exception.SerializationException;
 import smarthomesystem.repos.dao.models.RgbStripSerializedFileFormat;
-import data.ShsSerializer;
+import data.Serializer;
 import java.io.FileNotFoundException;
 import java.util.UUID;
 import java.util.logging.Level;
@@ -25,9 +25,9 @@ import smarthomesystem.repos.dao.models.RgbStripDao;
 @Injectable
 public class RgbStripRepository extends Repository<RgbStripDao> {
 
-    private final ShsSerializer serializer;
+    private final Serializer serializer;
 
-    public RgbStripRepository(ShsSerializer serializer) {
+    public RgbStripRepository(Serializer serializer) {
         this.serializer = serializer;
         loadRecordsFromStorage();
     }

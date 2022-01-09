@@ -7,7 +7,7 @@ package smarthomesystem.ui.services.connection;
 
 import annotations.Injectable;
 import data.PathProvider;
-import data.SerializationUtils;
+import data.Serializer;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -34,15 +34,15 @@ import smarthomesystem.ui.services.FrameService;
 @Injectable
 public class BluetoothConnectionFrameService extends FrameService<BluetoothConnectionFrame> {
 
-    private final SerializationUtils serializationUtils;
+    private final Serializer shsSerializer;
     private final PathProvider pathProvider;
 
     private final String bluetoothDevicesFileName = "bluetoothDevices.shs";
     private final String selectedDeviceFileName = "selectedDevice.shs";
     private final boolean LOAD_VIRTUAL_DEVICE = true;
 
-    public BluetoothConnectionFrameService(SerializationUtils serializationUtils, PathProvider pathProvider) {
-        this.serializationUtils = serializationUtils;
+    public BluetoothConnectionFrameService(Serializer shsSerializer, PathProvider pathProvider) {
+        this.shsSerializer = shsSerializer;
         this.pathProvider = pathProvider;
     }
 
@@ -51,8 +51,8 @@ public class BluetoothConnectionFrameService extends FrameService<BluetoothConne
         Pair<String, String> deserializedSelectedDevice = null;
 
         try {
-            deserializedDevices = serializationUtils.deserializeByteData(Paths.get(serializationUtils.serializationDirectory, bluetoothDevicesFileName).toString());
-            deserializedSelectedDevice = serializationUtils.deserializeByteData(Paths.get(serializationUtils.serializationDirectory, selectedDeviceFileName).toString());
+            deserializedDevices = shsSerializer.deserializeByteData(Paths.get(shsSerializer.serializationDirectory, bluetoothDevicesFileName).toString());
+            deserializedSelectedDevice = shsSerializer.deserializeByteData(Paths.get(shsSerializer.serializationDirectory, selectedDeviceFileName).toString());
 
             checkVirtualDevice(deserializedDevices);
         } catch (IOException | ClassNotFoundException ex) {
@@ -94,8 +94,8 @@ public class BluetoothConnectionFrameService extends FrameService<BluetoothConne
 
         int selectedRow = frame.jTable1.getSelectedRow();
 
-        serializationUtils.serializeAsByteData(devices, Paths.get(pathProvider.getCurrentWorkingDirectory(), "serialized", bluetoothDevicesFileName));
-        serializationUtils.serializeAsByteData(new Pair((String) tableContent.getValueAt(selectedRow, 0), (String) tableContent.getValueAt(selectedRow, 1)), Paths.get(pathProvider.getCurrentWorkingDirectory(), "serialized", selectedDeviceFileName));
+        shsSerializer.serializeAsByteData(devices, Paths.get(pathProvider.getCurrentWorkingDirectory(), "serialized", bluetoothDevicesFileName));
+        shsSerializer.serializeAsByteData(new Pair((String) tableContent.getValueAt(selectedRow, 0), (String) tableContent.getValueAt(selectedRow, 1)), Paths.get(pathProvider.getCurrentWorkingDirectory(), "serialized", selectedDeviceFileName));
     }
 
     private void checkVirtualDevice(List<Pair<String, String>> deserializedDevices) {

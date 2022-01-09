@@ -10,7 +10,13 @@ import bananaconvert.BananaConvert;
 import bananaconvert.marshaler.exception.DeserializationException;
 import bananaconvert.marshaler.exception.SerializationException;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.PrintWriter;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import persistance.Repository;
@@ -20,16 +26,15 @@ import persistance.Repository;
  * @author Manel
  */
 @Injectable
-public class ShsSerializer {
+public class Serializer {
 
     private final BananaConvert bananaConvert;
     private final PathProvider pathProvider;
-    private final SerializationUtils serializationUtils;
+    public final String serializationDirectory = "serialized";
 
-    public ShsSerializer(PathProvider pathProvider, SerializationUtils serializationUtils) {
+    public Serializer(PathProvider pathProvider) {
         bananaConvert = new BananaConvert();
         this.pathProvider = pathProvider;
-        this.serializationUtils = serializationUtils;
     }
 
     public BananaConvert getBananaConvert() {
@@ -41,7 +46,7 @@ public class ShsSerializer {
 
         String serializedToJson = bananaConvert.serializeToJson(repository.mapToSerializedFormat());
 
-        serializationUtils.serializeAsJson(serializedToJson, getPathToRepository(repository));
+        serializeAsJson(serializedToJson, getPathToRepository(repository));
     }
 
     public <K extends Repository, T> T loadRepository(K repository) throws FileNotFoundException, DeserializationException {
@@ -51,7 +56,31 @@ public class ShsSerializer {
     }
 
     public Path getSerializationPath() {
-        return Paths.get(pathProvider.getCurrentWorkingDirectory(), serializationUtils.serializationDirectory);
+        return Paths.get(pathProvider.getCurrentWorkingDirectory(), serializationDirectory);
+    }
+
+    public void serializeAsByteData(Object object, Path pathToStore) throws IOException {
+        File serializationTarget = pathToStore.toFile();
+
+        try (FileOutputStream file = new FileOutputStream(serializationTarget); ObjectOutputStream out = new ObjectOutputStream(file)) {
+            out.writeObject(object);
+        }
+    }
+
+    public <T> T deserializeByteData(String filePath) throws IOException, ClassNotFoundException {
+        T object1;
+
+        try (FileInputStream file = new FileInputStream(filePath); ObjectInputStream in = new ObjectInputStream(file)) {
+            object1 = (T) in.readObject();
+        }
+
+        return object1;
+    }
+
+    public void serializeAsJson(String serializedObject, Path pathToStore) throws FileNotFoundException {
+        try (PrintWriter out = new PrintWriter(pathToStore.toFile())) {
+            out.println(serializedObject);
+        }
     }
 
     private <K extends Repository> Path getPathToRepository(K repository) {
@@ -59,12 +88,12 @@ public class ShsSerializer {
     }
 
     private void checkSerializationDirectory() throws FileNotFoundException {
-        File serializationDirectory = getSerializationPath().toFile();
-        if (serializationDirectory.exists()) {
+        File serializationDirectoryFile = getSerializationPath().toFile();
+        if (serializationDirectoryFile.exists()) {
             return;
         }
 
-        if (serializationDirectory.mkdir()) {
+        if (serializationDirectoryFile.mkdir()) {
             return;
         }
 

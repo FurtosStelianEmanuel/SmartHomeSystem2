@@ -26,29 +26,31 @@ public class MessageIdentifierGenerator {
     private byte currentId = -128;
     private final Map<Class, Byte> identifiers = new HashMap<Class, Byte>() {
         {
-            put(ClearOutputBufferCommand.class, getNext());
-            put(ClearOutputBufferCommandResponse.class, getNext());
-            put(DistanceSensorQuery.class, getNext());
-            put(DistanceSensorQueryResult.class, getNext());
-            put(TestCommsCommand.class, getNext());
-            put(TestCommsCommandResponse.class, getNext());
-            put(SetSerialSettingsCommand.class, getNext());
-            put(SetSerialSettingsCommandResponse.class, getNext());
-            put(TurnOnBuiltInLedCommand.class, getNext());
-            put(TurnOnBuiltInLedCommandResponse.class, getNext());
-            put(TurnOffBuiltInLedCommand.class, getNext());
-            put(TurnOffBuiltInLedCommandResponse.class, getNext());
-            put(DoorOpenedCommand.class, getNext());
-            put(DoorOpenedCommandResponse.class, getNext());
-            put(ModulatePulseWidthCommand.class, getNext());
-            put(GenericCommandResponse.class, getNext());
-            put(AnalogValueQuery.class, getNext());
-            put(AnalogValueQueryResult.class, getNext());
-            put(TransitionStateCommand.class, getNext());
-            put(ModulatePulseWidthCommandResponse.class, getNext());
-            put(MicroControllerQuery.class, getNext());
-            put(MicroControllerQueryResult.class, getNext());
-            put(SetRgbStripColorCommand.class, getNext());
+            put(ClearOutputBufferCommand.class, getNext());         //0
+            put(ClearOutputBufferCommandResponse.class, getNext()); //1
+            put(DistanceSensorQuery.class, getNext());              //2
+            put(DistanceSensorQueryResult.class, getNext());        //3
+            put(TestCommsCommand.class, getNext());                 //4
+            put(TestCommsCommandResponse.class, getNext());         //5
+            put(SetSerialSettingsCommand.class, getNext());         //6
+            put(SetSerialSettingsCommandResponse.class, getNext()); //7
+            put(TurnOnBuiltInLedCommand.class, getNext());          //8
+            put(TurnOnBuiltInLedCommandResponse.class, getNext());  //9
+            put(TurnOffBuiltInLedCommand.class, getNext());         //10
+            put(TurnOffBuiltInLedCommandResponse.class, getNext()); //11
+            put(DoorOpenedCommand.class, getNext());                //12
+            put(DoorClosedCommand.class, getNext());                //13
+            put(ModulatePulseWidthCommand.class, getNext());        //14
+            put(GenericCommandResponse.class, getNext());           //15
+            put(AnalogValueQuery.class, getNext());                 //16
+            put(AnalogValueQueryResult.class, getNext());           //17
+            put(TransitionStateCommand.class, getNext());           //18
+            put(ModulatePulseWidthCommandResponse.class, getNext());//19
+            put(MicroControllerQuery.class, getNext());             //20
+            put(MicroControllerQueryResult.class, getNext());       //21
+            put(SetRgbStripColorCommand.class, getNext());          //22
+            put(SetColorSmoothlyCommand.class, getNext());          //23
+            put(StripTransitionedToColorCommand.class, getNext());  //24
         }
     };
     private final Map<Byte, Class> reversedIdentifiers;

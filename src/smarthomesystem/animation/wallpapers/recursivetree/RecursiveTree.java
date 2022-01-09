@@ -39,11 +39,11 @@ import java.util.Arrays;
 import messaging.MessageBroker;
 import messaging.MessageFactory;
 import messaging.exceptions.PackingNotImplementedException;
-import smarthomesystem.commands.SetRgbStripColorCommand;
 import smarthomesystem.ledstrips.RgbStripDetailProjection;
 import smarthomesystem.repos.RgbStripRepository;
 import smarthomesystem.animation.AnimationConfig;
 import smarthomesystem.RgbColorSender;
+import smarthomesystem.commands.SetColorSmoothlyCommand;
 
 /**
  *
@@ -59,8 +59,9 @@ public class RecursiveTree extends Wallpaper implements RgbColorSender, Animatio
     private int maximumBranchIterations = 5;
     private double leafDiameter = 15;
     private boolean showTree = true;
-
     private final Map<Integer, Color> leavesColors;
+    private Color previousColor = Color.black;
+
     private final Serializer shsSerializer;
     private final Path serializationPath;
     private final MessageFactory messageFactory;
@@ -291,24 +292,37 @@ public class RecursiveTree extends Wallpaper implements RgbColorSender, Animatio
     @Override
     public void sendColor(Color color) {
         MessageBroker messageBroker = container.resolveDependencies(MessageBroker.class);
-        SetRgbStripColorCommand setRgbStripColorCommand = messageFactory.createReflectiveInstance(SetRgbStripColorCommand.class);
-
-        setRgbStripColorCommand.red = color.getRed();
-        setRgbStripColorCommand.green = color.getGreen();
-        setRgbStripColorCommand.blue = color.getBlue();
+        SetColorSmoothlyCommand setColorSmoothlyCommand = messageFactory.createReflectiveInstance(SetColorSmoothlyCommand.class);
 
         RgbStripDetailProjection[] strips = rgbStripRepository.getStrips();
         RgbStripDetailProjection primaryStrip = Arrays.asList(strips).stream().filter(s -> s.isPrimary).findFirst().orElse(null);
 
-        setRgbStripColorCommand.redPin = primaryStrip.redPin;
-        setRgbStripColorCommand.greenPin = primaryStrip.greenPin;
-        setRgbStripColorCommand.bluePin = primaryStrip.bluePin;
+        setColorSmoothlyCommand.stripType = 0;
+        setColorSmoothlyCommand.redPin = primaryStrip.redPin;
+        setColorSmoothlyCommand.greenPin = primaryStrip.greenPin;
+        setColorSmoothlyCommand.bluePin = primaryStrip.bluePin;
+
+        setColorSmoothlyCommand.currentRed = getPreviousColor().getRed();
+        setColorSmoothlyCommand.currentGreen = getPreviousColor().getGreen();
+        setColorSmoothlyCommand.currentBlue = getPreviousColor().getBlue();
+
+        setColorSmoothlyCommand.increment = 1;
+        setColorSmoothlyCommand.targetRed = color.getRed();
+        setColorSmoothlyCommand.targetGreen = color.getGreen();
+        setColorSmoothlyCommand.targetBlue = color.getBlue();
+
+        previousColor = color;
 
         try {
-            messageBroker.send(setRgbStripColorCommand);
+            messageBroker.send(setColorSmoothlyCommand);
         } catch (IOException | PackingNotImplementedException ex) {
             Logger.getLogger(RecursiveTree.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+
+    @Override
+    public Color getPreviousColor() {
+        return previousColor;
     }
 
     @Override

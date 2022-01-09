@@ -14,4 +14,6 @@ import java.awt.Color;
 public interface RgbColorSender {
 
     void sendColor(Color color);
+
+    Color getPreviousColor();
 }

@@ -9,14 +9,16 @@ import messaging.CommandHandler;
 import messaging.MessageBroker;
 import messaging.MessageFactory;
 import messaging.events.EventDispatcher;
+import smarthomesystem.commands.DoorClosedCommand;
 import smarthomesystem.commands.DoorOpenedCommand;
+import smarthomesystem.commands.StripTransitionedToColorCommand;
 import smarthomesystem.events.models.DoorOpened;
 
 /**
  *
  * @author Manel
  */
-public class ArduinoPeripheralsCommandHandler extends CommandHandler implements ArduinoPeripheralsCommandHandlerInterface {
+public class ArduinoPeripheralsCommandHandler extends CommandHandler {
 
     private final MessageBroker broker;
     private final MessageFactory messageFactory;
@@ -28,8 +30,15 @@ public class ArduinoPeripheralsCommandHandler extends CommandHandler implements 
         this.eventDispatcher = eventDispatcher;
     }
 
-    @Override
     public void handle(DoorOpenedCommand command) {
         eventDispatcher.dispatchEvent(new DoorOpened());
+    }
+
+    public void handle(DoorClosedCommand command) {
+        System.out.println("fac handle la door closed");
+    }
+
+    public void handle(StripTransitionedToColorCommand command) {
+        System.out.println("A ajuns culoarea la ce trb");
     }
 }

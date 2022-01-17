@@ -35,7 +35,7 @@ public class IndexFrameEventHandler extends EventHandler {
 
     public void handle(IndexFrameOpened event) {
         SetSerialSettingsCommand setSerialSettings = messageFactory.createReflectiveInstance(SetSerialSettingsCommand.class);
-        setSerialSettings.bufferSize = 8;
+        setSerialSettings.bufferSize = 32;
         setSerialSettings.timeout = 5;
 
         try {

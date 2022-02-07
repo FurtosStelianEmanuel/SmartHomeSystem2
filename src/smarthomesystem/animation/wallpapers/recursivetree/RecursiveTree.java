@@ -311,6 +311,8 @@ public class RecursiveTree extends Wallpaper implements RgbColorSender, Animatio
         setColorSmoothlyCommand.targetGreen = color.getGreen();
         setColorSmoothlyCommand.targetBlue = color.getBlue();
 
+        setColorSmoothlyCommand.takeCurrentValuesFromSubRoutine = true;
+        
         previousColor = color;
         
         try {

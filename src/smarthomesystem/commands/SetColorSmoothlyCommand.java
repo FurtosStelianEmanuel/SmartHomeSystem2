@@ -19,7 +19,8 @@ public class SetColorSmoothlyCommand extends Command {
     public int increment;
     public int currentRed, currentGreen, currentBlue;
     public int targetRed, targetGreen, targetBlue;
-
+    public boolean takeCurrentValuesFromSubRoutine;
+    
     public SetColorSmoothlyCommand(byte identifier) {
         super(identifier);
     }

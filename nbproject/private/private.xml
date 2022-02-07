@@ -3,19 +3,12 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/Users/Manel/Documents/NetBeansProjects/SmartHomeSystem2/src/smarthomesystem/commandhandlers/ArduinoPeripheralsCommandHandler.java</file>
-            <file>file:/C:/Users/Manel/Documents/NetBeansProjects/SmartHomeSystem2/src/messaging/MessageIdentifierGenerator.java</file>
-            <file>file:/C:/Users/Manel/Documents/NetBeansProjects/SmartHomeSystem2/src/smarthomesystem/animation/wallpapers/recursivetree/RecursiveTree.java</file>
-            <file>file:/C:/Users/Manel/Documents/NetBeansProjects/SmartHomeSystem2/src/smarthomesystem/ui/services/connection/BluetoothConnectionFrameService.java</file>
-            <file>file:/C:/Users/Manel/Documents/NetBeansProjects/SmartHomeSystem2/src/smarthomesystem/commands/DoorClosedCommand.java</file>
-            <file>file:/C:/Users/Manel/Documents/NetBeansProjects/SmartHomeSystem2/src/data/Serializer.java</file>
-            <file>file:/C:/Users/Manel/Documents/NetBeansProjects/SmartHomeSystem2/src/smarthomesystem/commands/DoorOpenedCommand.java</file>
+            <file>file:/C:/Users/Manel/Documents/NetBeansProjects/SmartHomeSystem2/src/messaging/Command.java</file>
             <file>file:/C:/Users/Manel/Documents/NetBeansProjects/SmartHomeSystem2/src/smarthomesystem/commands/SetColorSmoothlyCommand.java</file>
-            <file>file:/C:/Users/Manel/Documents/NetBeansProjects/SmartHomeSystem2/src/smarthomesystem/events/models/DoorOpened.java</file>
-            <file>file:/C:/Users/Manel/Documents/NetBeansProjects/SmartHomeSystem2/src/smarthomesystem/RgbColorSender.java</file>
+            <file>file:/C:/Users/Manel/Documents/NetBeansProjects/SmartHomeSystem2/src/smarthomesystem/commandhandlers/ArduinoPeripheralsCommandHandler.java</file>
             <file>file:/C:/Users/Manel/Documents/NetBeansProjects/SmartHomeSystem2/src/smarthomesystem/commands/StripTransitionedToColorCommand.java</file>
-            <file>file:/C:/Users/Manel/Documents/NetBeansProjects/SmartHomeSystem2/src/smarthomesystem/events/handlers/ArduinoPeripheralsEventHandler.java</file>
-            <file>file:/C:/Users/Manel/Documents/NetBeansProjects/SmartHomeSystem2/src/smarthomesystem/SmartHomeSystem.java</file>
+            <file>file:/C:/Users/Manel/Documents/NetBeansProjects/SmartHomeSystem2/src/messaging/Message.java</file>
+            <file>file:/C:/Users/Manel/Documents/NetBeansProjects/SmartHomeSystem2/src/smarthomesystem/animation/wallpapers/recursivetree/RecursiveTree.java</file>
         </group>
     </open-files>
 </project-private>

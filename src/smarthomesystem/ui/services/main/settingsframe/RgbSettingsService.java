@@ -24,12 +24,15 @@ import smarthomesystem.repos.RgbStripRepository;
 import smarthomesystem.ui.frames.main.IndexFrame;
 import smarthomesystem.ui.frames.main.SettingsFrame;
 import smarthomesystem.ui.frames.main.settingsframe.RgbFrameInterface;
+import smarthomesystem.ui.services.main.DataHandlingException;
+import smarthomesystem.ui.services.main.DataInteractionService;
+import smarthomesystem.ui.services.main.TabbedFrameService;
 
 /**
  *
  * @author Manel
  */
-public class RgbSettingsService {
+public class RgbSettingsService implements TabbedFrameService, DataInteractionService {
 
     private SettingsFrame frame;
     private RgbFrameInterface rgbInterface;
@@ -54,20 +57,23 @@ public class RgbSettingsService {
         this.messageFactory = messageFactory;
     }
 
-    public void tabSelected(SettingsFrame frame) {
+    @Override
+    public void selectTab(SettingsFrame frame) {
         this.frame = frame;
         rgbInterface = (RgbFrameInterface) frame;
         frame.setPresetSettingsEnabled(false);
         setupActiveMicroController();
-        setupRgbStrip();
+        setupRgbStrips();
     }
 
-    public void cancelStripChanges() {
+    @Override
+    public void cancel() {
         rgbStripRepository.removeTemporaryStrips();
         hideSettingsFrameAndShowIndexFrame();
     }
 
-    public void saveRgbSettings() throws FileNotFoundException, SerializationException {
+    @Override
+    public void save() throws DataHandlingException {
         RgbStripDetailProjection selectedStrip = getSelectedStrip();
 
         if (selectedStrip != null) {
@@ -78,11 +84,12 @@ public class RgbSettingsService {
         try {
             rgbStripRepository.commitRecordsToStorage();
         } catch (FileNotFoundException | SerializationException ex) {
-            throw ex;
+            throw new DataHandlingException(ex);
         }
     }
 
-    public void saveRgbSettingsAndExit() throws FileNotFoundException, SerializationException {
+    @Override
+    public void saveAndExit() throws DataHandlingException {
         RgbStripDetailProjection selectedStrip = getSelectedStrip();
 
         if (selectedStrip != null) {
@@ -93,7 +100,7 @@ public class RgbSettingsService {
         try {
             rgbStripRepository.commitRecordsToStorage();
         } catch (FileNotFoundException | SerializationException ex) {
-            throw ex;
+            throw new DataHandlingException(ex);
         }
 
         hideSettingsFrameAndShowIndexFrame();
@@ -104,7 +111,8 @@ public class RgbSettingsService {
         container.resolveDependencies(IndexFrame.class).setVisible(true);
     }
 
-    public void addNewStrip() {
+    @Override
+    public void add() {
         String stripDescription = JOptionPane.showInputDialog(frame, "Led strip description");
         MicroControllerDetailProjection activeMicroController = microControllerRepository.getActiveMicroController();
 
@@ -119,10 +127,11 @@ public class RgbSettingsService {
             }
         });
 
-        setupRgbStrip();
+        setupRgbStrips();
     }
 
-    public void removeStrip(String stripDescription) {
+    @Override
+    public void delete(String stripDescription) {
         rgbStripRepository.removeStrip(stripDescription);
         frame.jComboBox2.removeItem(stripDescription);
         RgbStripDetailProjection[] strips = rgbStripRepository.getStrips();
@@ -132,7 +141,7 @@ public class RgbSettingsService {
         }
     }
 
-    public void setupRgbStrip() {
+    public void setupRgbStrips() {
         RgbStripDetailProjection[] strips = rgbStripRepository.getStrips();
 
         if (strips.length == 0) {
@@ -159,6 +168,11 @@ public class RgbSettingsService {
 
         System.out.println("Sending " + brightness);
         messageBroker.send(modulatePulseWidthCommand, responseListenerForModulatePulseWidthCommand);
+    }
+
+    @Override
+    public void edit() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     private RgbStripDetailProjection getSelectedStrip() {

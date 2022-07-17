@@ -3,12 +3,27 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/Users/Manel/Documents/NetBeansProjects/SmartHomeSystem2/src/messaging/Command.java</file>
-            <file>file:/C:/Users/Manel/Documents/NetBeansProjects/SmartHomeSystem2/src/smarthomesystem/commands/SetColorSmoothlyCommand.java</file>
-            <file>file:/C:/Users/Manel/Documents/NetBeansProjects/SmartHomeSystem2/src/smarthomesystem/commandhandlers/ArduinoPeripheralsCommandHandler.java</file>
-            <file>file:/C:/Users/Manel/Documents/NetBeansProjects/SmartHomeSystem2/src/smarthomesystem/commands/StripTransitionedToColorCommand.java</file>
-            <file>file:/C:/Users/Manel/Documents/NetBeansProjects/SmartHomeSystem2/src/messaging/Message.java</file>
-            <file>file:/C:/Users/Manel/Documents/NetBeansProjects/SmartHomeSystem2/src/smarthomesystem/animation/wallpapers/recursivetree/RecursiveTree.java</file>
+            <file>file:/C:/Users/Manel/Documents/NetBeansProjects/SmartHomeSystem2/src/smarthomesystem/ui/frames/main/settingsframe/RgbFrameInterface.java</file>
+            <file>file:/C:/Users/Manel/Documents/NetBeansProjects/SmartHomeSystem2/src/smarthomesystem/ui/frames/main/settingsframe/LightSensorInterface.java</file>
+            <file>file:/C:/Users/Manel/Documents/NetBeansProjects/SmartHomeSystem2/src/smarthomesystem/lightsensors/SpecificValues.java</file>
+            <file>file:/C:/Users/Manel/Documents/NetBeansProjects/SmartHomeSystem2/src/smarthomesystem/ui/frames/main/SettingsFrame.java</file>
+            <file>file:/C:/Users/Manel/Documents/NetBeansProjects/SmartHomeSystem2/src/smarthomesystem/repos/dao/PersistedComponent.java</file>
+            <file>file:/C:/Users/Manel/Documents/NetBeansProjects/SmartHomeSystem2/src/persistance/Repository.java</file>
+            <file>file:/C:/Users/Manel/Documents/NetBeansProjects/SmartHomeSystem2/src/smarthomesystem/ui/services/main/DataHandlingException.java</file>
+            <file>file:/C:/Users/Manel/Documents/NetBeansProjects/SmartHomeSystem2/src/smarthomesystem/repos/LightSensorRepository.java</file>
+            <file>file:/C:/Users/Manel/Documents/NetBeansProjects/SmartHomeSystem2/src/smarthomesystem/ui/services/main/settingsframe/MicroControllerSettingsService.java</file>
+            <file>file:/C:/Users/Manel/Documents/NetBeansProjects/SmartHomeSystem2/src/data/Serializer.java</file>
+            <file>file:/C:/Users/Manel/Documents/NetBeansProjects/SmartHomeSystem2/src/smarthomesystem/ui/services/main/settingsframe/RgbSettingsService.java</file>
+            <file>file:/C:/Users/Manel/Documents/NetBeansProjects/SmartHomeSystem2/src/smarthomesystem/ui/services/main/SettingsFrameService.java</file>
+            <file>file:/C:/Users/Manel/Documents/NetBeansProjects/SmartHomeSystem2/src/smarthomesystem/ui/services/main/DataInteractionService.java</file>
+            <file>file:/C:/Users/Manel/Documents/NetBeansProjects/SmartHomeSystem2/src/smarthomesystem/repos/dao/models/LightSensorDao.java</file>
+            <file>file:/C:/Users/Manel/Documents/NetBeansProjects/SmartHomeSystem2/src/smarthomesystem/lightsensors/PhotoresistorSpecificValues.java</file>
+            <file>file:/C:/Users/Manel/Documents/NetBeansProjects/SmartHomeSystem2/src/smarthomesystem/repos/RgbStripRepository.java</file>
+            <file>file:/C:/Users/Manel/Documents/NetBeansProjects/SmartHomeSystem2/src/smarthomesystem/lightsensors/LightSensorDetail.java</file>
+            <file>file:/C:/Users/Manel/Documents/NetBeansProjects/SmartHomeSystem2/src/smarthomesystem/ui/services/main/TabbedFrameService.java</file>
+            <file>file:/C:/Users/Manel/Documents/NetBeansProjects/SmartHomeSystem2/src/smarthomesystem/ui/services/main/settingsframe/LightSensorService.java</file>
+            <file>file:/C:/Users/Manel/Documents/NetBeansProjects/SmartHomeSystem2/src/smarthomesystem/repos/dao/models/RgbStripDao.java</file>
+            <file>file:/C:/Users/Manel/Documents/NetBeansProjects/SmartHomeSystem2/src/smarthomesystem/ledstrips/RgbStripDetailProjection.java</file>
         </group>
     </open-files>
 </project-private>

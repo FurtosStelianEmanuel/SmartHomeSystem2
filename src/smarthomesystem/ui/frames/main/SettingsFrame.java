@@ -19,8 +19,13 @@ import messaging.exceptions.PackingNotImplementedException;
 import smarthomesystem.ledstrips.RgbStripDetailProjection;
 import smarthomesystem.ui.CustomUIs;
 import smarthomesystem.ui.ServiceableFrame;
+import smarthomesystem.ui.frames.main.settingsframe.LightSensorInterface;
 import smarthomesystem.ui.frames.main.settingsframe.RgbFrameInterface;
+import smarthomesystem.ui.services.main.DataHandlingException;
 import smarthomesystem.ui.services.main.SettingsFrameService;
+import smarthomesystem.ui.services.main.settingsframe.LightSensorService;
+import smarthomesystem.ui.services.main.settingsframe.MicroControllerSettingsService;
+import smarthomesystem.ui.services.main.settingsframe.RgbSettingsService;
 import smarthomesystem.ui.services.main.settingsframe.constants.SettingsFrameConstants;
 
 /**
@@ -28,7 +33,9 @@ import smarthomesystem.ui.services.main.settingsframe.constants.SettingsFrameCon
  * @author Manel
  */
 @Injectable
-public class SettingsFrame extends ServiceableFrame<SettingsFrameService> implements RgbFrameInterface {
+public class SettingsFrame extends ServiceableFrame<SettingsFrameService> implements
+        RgbFrameInterface,
+        LightSensorInterface {
 
     public SettingsFrame() {
         initComponents();
@@ -720,20 +727,40 @@ public class SettingsFrame extends ServiceableFrame<SettingsFrameService> implem
         });
         jScrollPane3.setViewportView(jTable2);
 
-        jPanel14.setLayout(new java.awt.GridLayout());
+        jPanel14.setLayout(new java.awt.GridLayout(1, 0));
 
         jButton6.setText("Add");
+        jButton6.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton6ActionPerformed(evt);
+            }
+        });
         jPanel14.add(jButton6);
 
         jButton8.setText("Edit");
+        jButton8.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton8ActionPerformed(evt);
+            }
+        });
         jPanel14.add(jButton8);
 
         jButton7.setText("Remove");
+        jButton7.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton7ActionPerformed(evt);
+            }
+        });
         jPanel14.add(jButton7);
 
-        jPanel15.setLayout(new java.awt.GridLayout());
+        jPanel15.setLayout(new java.awt.GridLayout(1, 0));
 
         jButton12.setText("Save changes and exit");
+        jButton12.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton12ActionPerformed(evt);
+            }
+        });
         jPanel15.add(jButton12);
 
         jButton13.setText("Save changes");
@@ -827,7 +854,7 @@ public class SettingsFrame extends ServiceableFrame<SettingsFrameService> implem
 
     private void jSlider1StateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jSlider1StateChanged
         try {
-            service.getRgbSettingsService().setBrightness(jComboBox1.getSelectedItem().toString(), ((JSlider) evt.getSource()).getValue());
+            service.getSubService(RgbSettingsService.class).setBrightness(jComboBox1.getSelectedItem().toString(), ((JSlider) evt.getSource()).getValue());
         } catch (IOException | PackingNotImplementedException ex) {
             Logger.getLogger(SettingsFrame.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -835,7 +862,7 @@ public class SettingsFrame extends ServiceableFrame<SettingsFrameService> implem
 
     private void jSlider2StateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jSlider2StateChanged
         try {
-            service.getRgbSettingsService().setBrightness(jComboBox4.getSelectedItem().toString(), ((JSlider) evt.getSource()).getValue());
+            service.getSubService(RgbSettingsService.class).setBrightness(jComboBox4.getSelectedItem().toString(), ((JSlider) evt.getSource()).getValue());
         } catch (IOException | PackingNotImplementedException ex) {
             Logger.getLogger(SettingsFrame.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -843,7 +870,7 @@ public class SettingsFrame extends ServiceableFrame<SettingsFrameService> implem
 
     private void jSlider3StateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jSlider3StateChanged
         try {
-            service.getRgbSettingsService().setBrightness(jComboBox5.getSelectedItem().toString(), ((JSlider) evt.getSource()).getValue());
+            service.getSubService(RgbSettingsService.class).setBrightness(jComboBox5.getSelectedItem().toString(), ((JSlider) evt.getSource()).getValue());
         } catch (IOException | PackingNotImplementedException ex) {
             Logger.getLogger(SettingsFrame.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -851,14 +878,14 @@ public class SettingsFrame extends ServiceableFrame<SettingsFrameService> implem
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         try {
-            service.getRgbSettingsService().saveRgbSettingsAndExit();
-        } catch (FileNotFoundException | SerializationException ex) {
+            service.getSubService(RgbSettingsService.class).saveAndExit();
+        } catch (DataHandlingException ex) {
             Logger.getLogger(SettingsFrame.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        service.getRgbSettingsService().addNewStrip();
+        service.getSubService(RgbSettingsService.class).add();
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jComboBox2ItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jComboBox2ItemStateChanged
@@ -866,21 +893,21 @@ public class SettingsFrame extends ServiceableFrame<SettingsFrameService> implem
             return;
         }
 
-        service.getRgbSettingsService().rgbStripChanged((String) ((JComboBox) evt.getSource()).getSelectedItem());
+        service.getSubService(RgbSettingsService.class).rgbStripChanged((String) ((JComboBox) evt.getSource()).getSelectedItem());
     }//GEN-LAST:event_jComboBox2ItemStateChanged
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
-        service.getRgbSettingsService().cancelStripChanges();
+        service.getSubService(RgbSettingsService.class).cancel();
     }//GEN-LAST:event_jButton3ActionPerformed
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
-        service.getRgbSettingsService().removeStrip((String) jComboBox2.getSelectedItem());
+        service.getSubService(RgbSettingsService.class).delete((String) jComboBox2.getSelectedItem());
     }//GEN-LAST:event_jButton4ActionPerformed
 
     private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
         try {
-            service.getRgbSettingsService().saveRgbSettings();
-        } catch (FileNotFoundException | SerializationException ex) {
+            service.getSubService(RgbSettingsService.class).save();
+        } catch (DataHandlingException ex) {
             Logger.getLogger(SettingsFrame.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_jButton5ActionPerformed
@@ -891,8 +918,8 @@ public class SettingsFrame extends ServiceableFrame<SettingsFrameService> implem
 
     private void jButton10ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton10ActionPerformed
         try {
-            service.getMicroControllerSettingsService().saveChanges();
-        } catch (IOException | PackingNotImplementedException ex) {
+            service.getSubService(MicroControllerSettingsService.class).save();
+        } catch (DataHandlingException ex) {
             Logger.getLogger(SettingsFrame.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_jButton10ActionPerformed
@@ -906,12 +933,36 @@ public class SettingsFrame extends ServiceableFrame<SettingsFrameService> implem
     }//GEN-LAST:event_jToggleButton1ActionPerformed
 
     private void jButton13ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton13ActionPerformed
-        // TODO add your handling code here:
+        try {
+            service.getSubService(LightSensorService.class).save();
+        } catch (DataHandlingException ex) {
+            Logger.getLogger(SettingsFrame.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }//GEN-LAST:event_jButton13ActionPerformed
 
     private void jButton14ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton14ActionPerformed
-        // TODO add your handling code here:
+        service.getSubService(LightSensorService.class).cancel();
     }//GEN-LAST:event_jButton14ActionPerformed
+
+    private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
+        service.getSubService(LightSensorService.class).add();
+    }//GEN-LAST:event_jButton6ActionPerformed
+
+    private void jButton8ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton8ActionPerformed
+        service.getSubService(LightSensorService.class).edit();
+    }//GEN-LAST:event_jButton8ActionPerformed
+
+    private void jButton7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton7ActionPerformed
+        service.getSubService(LightSensorService.class).delete("identifier");
+    }//GEN-LAST:event_jButton7ActionPerformed
+
+    private void jButton12ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton12ActionPerformed
+        try {
+            service.getSubService(LightSensorService.class).saveAndExit();
+        } catch (DataHandlingException ex) {
+            Logger.getLogger(SettingsFrame.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_jButton12ActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     public javax.swing.JLabel connectionDate;

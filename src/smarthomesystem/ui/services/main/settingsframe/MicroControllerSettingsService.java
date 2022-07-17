@@ -10,6 +10,8 @@ import arduino.MicroControllerDetailProjection;
 import data.DateTimeService;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import messaging.Command;
 import messaging.MessageBroker;
 import messaging.MessageFactory;
@@ -22,13 +24,16 @@ import messaging.exceptions.PackingNotImplementedException;
 import smarthomesystem.commands.TransitionStateCommand;
 import smarthomesystem.repos.MicroControllerRepository;
 import smarthomesystem.ui.frames.main.SettingsFrame;
+import smarthomesystem.ui.services.main.DataHandlingException;
+import smarthomesystem.ui.services.main.DataInteractionService;
+import smarthomesystem.ui.services.main.TabbedFrameService;
 import smarthomesystem.ui.services.main.settingsframe.constants.SettingsFrameConstants;
 
 /**
  *
  * @author Manel
  */
-public class MicroControllerSettingsService {
+public class MicroControllerSettingsService implements TabbedFrameService, DataInteractionService {
 
     private SettingsFrame frame;
     private final MicroControllerRepository microControllerRepository;
@@ -60,22 +65,53 @@ public class MicroControllerSettingsService {
         frame.connectionDate.setText(dateTimeService.getStringFromDateTime(activeMicroController.connectionDate));
     }
 
-    public void tabSelected(SettingsFrame frame) {
+    @Override
+    public void selectTab(SettingsFrame frame) {
         this.frame = frame;
         loadMicroController();
     }
 
-    public void saveChanges() throws IOException, PackingNotImplementedException {
-        Command setStatusPinStateCommand = calculateStatusPinState();
-        Command setMicroControllerStateCommand = calculateMicroControllerState();
+    @Override
+    public void save() throws DataHandlingException {
+        try {
+            Command setStatusPinStateCommand = calculateStatusPinState();
+            Command setMicroControllerStateCommand = calculateMicroControllerState();
 
-        messageBroker.send(setStatusPinStateCommand);
-        messageBroker.send(setMicroControllerStateCommand, new ResponseListener(new ResponseCallback<GenericCommandResponse>(GenericCommandResponse.class) {
-            @Override
-            public void onResponse(GenericCommandResponse response) {
-                System.out.println(response.isValid);
-            }
-        }));
+            messageBroker.send(setStatusPinStateCommand);
+            messageBroker.send(setMicroControllerStateCommand, new ResponseListener(new ResponseCallback<GenericCommandResponse>(GenericCommandResponse.class) {
+                @Override
+                public void onResponse(GenericCommandResponse response) {
+                    System.out.println(response.isValid);
+                }
+            }));
+        } catch (IOException | PackingNotImplementedException ex) {
+            throw new DataHandlingException(ex);
+        }
+    }
+
+    @Override
+    public void cancel() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void saveAndExit() throws DataHandlingException {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void add() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void edit() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void delete(String identifier) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     private Command calculateStatusPinState() {

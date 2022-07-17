@@ -11,6 +11,7 @@ import javax.swing.event.ChangeEvent;
 import smarthomesystem.ui.frames.main.SettingsFrame;
 import smarthomesystem.ui.services.FrameService;
 import static smarthomesystem.SmartHomeSystem.container;
+import smarthomesystem.ui.services.main.settingsframe.LightSensorService;
 import smarthomesystem.ui.services.main.settingsframe.MicroControllerSettingsService;
 import smarthomesystem.ui.services.main.settingsframe.RgbSettingsService;
 
@@ -23,10 +24,12 @@ public class SettingsFrameService extends FrameService<SettingsFrame> {
 
     private final RgbSettingsService rgbSettingsService;
     private final MicroControllerSettingsService microControllerSettingsService;
+    private final LightSensorService lightSensorService;
 
     public SettingsFrameService() {
         rgbSettingsService = container.resolveDependencies(RgbSettingsService.class);
         microControllerSettingsService = container.resolveDependencies(MicroControllerSettingsService.class);
+        lightSensorService = container.resolveDependencies(LightSensorService.class);
     }
 
     public void frameOpened() {
@@ -34,24 +37,31 @@ public class SettingsFrameService extends FrameService<SettingsFrame> {
             JTabbedPane tabbedPane = (JTabbedPane) e.getSource();
             switch (tabbedPane.getSelectedIndex()) {
                 case 0:
-                    rgbSettingsService.tabSelected(frame);
+                    rgbSettingsService.selectTab(frame);
                     break;
                 case 1:
                     break;
                 case 2:
-                    microControllerSettingsService.tabSelected(frame);
+                    microControllerSettingsService.selectTab(frame);
+                    break;
+                case 3:
+                    lightSensorService.selectTab(frame);
                     break;
             }
         });
 
-        rgbSettingsService.tabSelected(frame);
+        rgbSettingsService.selectTab(frame);
     }
 
-    public RgbSettingsService getRgbSettingsService() {
-        return rgbSettingsService;
-    }
+    public <K> K getSubService(Class<K> type) {
+        if (type == RgbSettingsService.class) {
+            return (K) rgbSettingsService;
+        } else if (type == MicroControllerSettingsService.class) {
+            return (K) microControllerSettingsService;
+        } else if (type == LightSensorService.class) {
+            return (K) lightSensorService;
+        }
 
-    public MicroControllerSettingsService getMicroControllerSettingsService() {
-        return microControllerSettingsService;
+        return null;
     }
 }
